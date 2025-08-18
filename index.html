@@ -6,9 +6,61 @@
 		<title>cloud-burst-saas-flare</title>
 		<script project-code="v1tq314cxsan" src="https://easysite.ai/ezsite-api.js"></script>
 		<script src="https://easysite.ai/ezsite-chatbot.js"></script>
+		<style>
+			/* شعار بسيط أعلى الصفحة */
+			#site-logo {
+				display: block;
+				max-width: 220px;
+				height: auto;
+				margin: 18px auto;
+			}
+			/* إذا رغبت بمحاذاة للشريط العلوي بدلاً من التمركز:
+			#site-logo { margin: 12px 24px; display:inline-block; float:left; }
+			*/
+		</style>
 	</head>
 	<body>
+		<!-- الشعار الجديد: ضع ملف الصورة في /assets/logo.png -->
+		<img id="site-logo" src="./assets/logo.png" alt="Site Logo">
 		<div id="root"></div>
 		<script type="module" src="/src/main.tsx"></script>
+
+		<!-- سكربت يبحث ويستبدل أي عنصر شعار تلقائياً -->
+		<script>
+			(function(){
+				const logoPath = './assets/logo.png';
+
+				function looksLikeLogoIdentifier(str){
+					return !!str && str.toLowerCase().includes('logo');
+				}
+
+				function replaceLogos(){
+					// استبدال عناصر <img>
+					document.querySelectorAll('img').forEach(img => {
+						const info = `${img.id||''} ${img.className||''} ${img.alt||''}`.toLowerCase();
+						const srcIsLogo = /logo[\-_.\d]*\.(png|jpg|jpeg|svg|webp)/i.test(img.src || '');
+						if (looksLikeLogoIdentifier(info) || srcIsLogo) {
+							if (img.src !== logoPath) img.src = logoPath;
+						}
+					});
+
+					// استبدال الخلفيات المضمنة التي تحتوي على كلمة logo
+					document.querySelectorAll('*').forEach(el => {
+						try {
+							const bg = getComputedStyle(el).backgroundImage || '';
+							if (bg && bg !== 'none' && bg.toLowerCase().includes('logo')) {
+								el.style.backgroundImage = `url("${logoPath}")`;
+							}
+						} catch(e) { /* تجاوز العناصر التي تسبب خطأ */ }
+					});
+				}
+
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', replaceLogos);
+				} else {
+					replaceLogos();
+				}
+			})();
+		</script>
 	</body>
 </html>

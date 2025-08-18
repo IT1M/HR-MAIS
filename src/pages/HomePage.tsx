@@ -10,12 +10,14 @@ const HomePage = () => {
             <header className="py-6 px-8 border-b bg-white/80 backdrop-blur-sm">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 8h-2v3h-3v2h3v3h2v-3h3v-2h-3V8zM4 6h5v2h2V6h1V4H4v2zm0 4h3v2H4v-2zm0 4h3v2H4v-2zM4 18h9v-2H4v2z" />
-                            </svg>
-                        </div>
-                        <h1 className="text-xl font-bold text-gray-800">شركة ميس للمشاريع الطبية</h1>
+                        {/* شعار الشركة */}
+                        <img
+                            src="/assets/logo.png"
+                            alt="شعار شركة ميس"
+                            className="w-12 h-12 object-contain rounded-full bg-white border border-gray-200 shadow"
+                            style={{ background: "#fff" }}
+                        />
+                        <h1 className="text-xl font-bold text-gray-800">Mais Co.</h1>
                     </div>
                     <nav className="space-x-4 space-x-reverse">
                         <Button variant="link">الرئيسية</Button>
@@ -31,19 +33,22 @@ const HomePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}>
 
-                    {/* Medical Company Logo */}
+                    {/* شعار الشركة في الصفحة الرئيسية */}
                     <div className="mb-8">
                         <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 bg-white border border-gray-200 shadow"
+              style={{ background: "#fff" }}>
 
-                            <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 8h-2v3h-3v2h3v3h2v-3h3v-2h-3V8zM4 6h5v2h2V6h1V4H4v2zm0 4h3v2H4v-2zm0 4h3v2H4v-2zM4 18h9v-2H4v2z" />
-                            </svg>
+                            <img
+                                src="/assets/logo.png"
+                                alt="شعار شركة ميس"
+                                className="w-20 h-20 object-contain rounded-full"
+                            />
                         </motion.div>
-                        <h2 className="text-2xl font-bold text-green-600 mb-2">شركة ميس للمشاريع الطبية</h2>
+                        <h2 className="text-2xl font-bold text-green-600 mb-2">Mais Co. For projects Medical</h2>
                         <p className="text-gray-600 dark:text-gray-400">المملكة العربية السعودية</p>
                     </div>
 
