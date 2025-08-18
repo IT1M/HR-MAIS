@@ -1,89 +1,53 @@
-# Welcome to your EzSite project
 
-A clean, modern React template with TypeScript, Vite, TailwindCSS, and ShadCN UI components. This template provides a solid foundation for building web applications with best practices in mind.
+واجهة ويب حديثة لإدارة الموارد البشرية مبنية على *React + TypeScript* مع *Vite* و*TailwindCSS* ومكوّنات *shadcn/ui*. الهدف إننا نوفّر أساس قوي وسريع قابل للتوسّع لبناء نظام موارد بشرية متكامل داخل مجموعة ميس (MAIS).
 
-## Tech Features
+	⁠*ملاحظة*: المستودع حالياً قالب React حديث (Vite + Tailwind + shadcn/ui) ومهيّأ للبدء بسرعة. قابل للتطوير لإضافة وحدات الموارد البشرية المذكورة أدناه. معلومات التقنيات والتراكيب مأخوذة من الصفحة الرئيسية للمستودع وإحصائيات اللغة.  [oai_citation:0‡GitHub](https://github.com/IT1M/HR-MAIS)
 
-- ⚡️ **Vite** - Lightning fast build tool
-- 🔥 **React 18** - Latest React features
-- 🧩 **TypeScript** - Type safety for better developer experience
-- 🎨 **TailwindCSS** - Utility-first CSS framework
-- 🧰 **ShadCN UI** - Accessible and customizable UI components
-- 📱 **Responsive Design** - Mobile-first approach
-- 🧭 **React Router** - Easy client-side routing
-- 🔄 **React Query** - Data fetching and state management
-- 🧪 **Form Handling** - React Hook Form with Zod validation
+---
 
-## Getting Started
+## ✨ المزايا التقنية (Tech Stack)
 
-### Prerequisites
+•⁠  ⁠⚡ *Vite* — بناء وتشغيل سريع للمشروع.
+•⁠  ⁠⚛️ *React 18* — أحدث مزايا React.
+•⁠  ⁠🧠 *TypeScript* — أمان أنواع وتجربة تطوير أفضل.
+•⁠  ⁠🎨 *TailwindCSS* — تصميم سريع بنمط Utility-First.
+•⁠  ⁠🧩 *shadcn/ui* — مكوّنات جاهزة ويمكن تخصيصها.
+•⁠  ⁠📱 *Responsive* — تصميم متجاوب للجوال والكمبيوتر.
+•⁠  ⁠🧭 *React Router* — توجيه صفحات بسيط.
+•⁠  ⁠🔄 *React Query* — جلب بيانات وإدارة حالة الخادم.
+•⁠  ⁠📝 *React Hook Form + Zod* — نماذج مع تحقّق قوي.
 
-- Node.js 18+ 
-- npm or yarn or pnpm
+	⁠يظهر من إحصائيات GitHub أن المشروع يعتمد بشكل أساسي على TypeScript، مع وجود JavaScript وCSS وHTML.  [oai_citation:1‡GitHub](https://github.com/IT1M/HR-MAIS)
 
-### Installation
+---
 
-1. Clone this repository:
+## 🧭 نطاق المشروع (الآن وما بعده)
+
+المستودع حالياً هو *قالب واجهة* قابل للتوسعة. الخطة المقترحة لوحدات الموارد البشرية (يمكن إضافتها تدريجياً):
+
+•⁠  ⁠👥 *إدارة الموظفين*: ملفات الموظفين، الهيكل التنظيمي، العقود، المستندات.
+•⁠  ⁠⏰ *الحضور والانصراف*: سجلات، شيفتات، إجازات.
+•⁠  ⁠🧾 *الرواتب*: بدلات، خصومات، مسيرات، تصدير تقارير.
+•⁠  ⁠📝 *طلبات ذاتية*: إجازة، انتداب، شهادة تعريف، تذاكر… الخ.
+•⁠  ⁠🎯 *الأداء*: أهداف (OKRs/KPIs)، تقييمات، خطط تطوير.
+•⁠  ⁠📚 *التعلّم*: دورات، مواد، تتبّع إنجازات.
+•⁠  ⁠📑 *الإبلاغ والتقارير*: لوحات معلومات ومؤشرات.
+•⁠  ⁠🔐 *الصلاحيات*: أدوار ومسارات موافقة (Workflows).
+
+	⁠هذه الوحدات مقترحة لتطوير المستودع لاحقاً حسب احتياج MAIS.
+
+---
+
+## 🛠 المتطلبات
+
+•⁠  ⁠*Node.js 18+*
+•⁠  ⁠أي مدير حزم: ⁠ npm ⁠ أو ⁠ yarn ⁠ أو ⁠ pnpm ⁠
+
+---
+
+## 🚀 التشغيل محلياً
+
+1) *نسخ المستودع*
 ```bash
-git clone https://github.com/your-username/react-template-project.git
-cd react-template-project
-```
-
-2. Install dependencies:
-```bash
-npm install
-# or
-yarn
-# or
-pnpm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-4. Open your browser and visit `http://localhost:5173`
-
-## Project Structure
-
-```
-react-template-project/
-├── public/              # Static assets
-│   ├── components/      # Reusable components
-│   │   └── ui/          # UI components from ShadCN
-│   ├── hooks/           # Custom React hooks
-│   ├── lib/             # Utility functions and libraries
-│   ├── pages/           # Page components
-│   ├── App.tsx          # Main application component
-│   ├── index.css        # Global styles
-│   └── main.tsx         # Application entry point
-├── .gitignore
-├── package.json         # Project dependencies and scripts
-├── tailwind.config.ts   # TailwindCSS configuration
-├── tsconfig.json        # TypeScript configuration
-└── vite.config.ts       # Vite configuration
-```
-
-## Customization
-
-- **Styling**: Modify `tailwind.config.ts` to customize your design tokens
-- **Components**: Add or modify components in the `src/components` directory
-- **Pages**: Create new pages in the `src/pages` directory
-- **Routing**: Update routes in `src/App.tsx`
-
-## Building for Production
-
-```bash
-npm run build
-# or
-yarn build
-# or
-pnpm build
-```
-
-The built files will be in the `dist` directory, ready to be deployed.
+git clone https://github.com/IT1M/HR-MAIS.git
+cd HR-MAIS
