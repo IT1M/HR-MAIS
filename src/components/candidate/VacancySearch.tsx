@@ -10,54 +10,54 @@ const VacancySearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [vacancies, setVacancies] = useState([
-    {
-      id: 1,
-      title: 'مطور React محترف',
-      department: 'التقنية',
-      location: 'الرياض',
-      type: 'دوام كامل',
-      experience: 'متوسط',
-      applicants: 45,
-      posted: '3 أيام',
-      salary: '12,000 - 18,000 ريال',
-      description: 'نبحث عن مطور React محترف للانضمام لفريقنا المتميز'
-    },
-    {
-      id: 2,
-      title: 'مصمم UI/UX إبداعي',
-      department: 'التصميم',
-      location: 'جدة',
-      type: 'دوام كامل',
-      experience: 'مبتدئ إلى متوسط',
-      applicants: 28,
-      posted: '1 أسبوع',
-      salary: '8,000 - 14,000 ريال',
-      description: 'مصمم مبدع لتصميم تجارب مستخدم استثنائية'
-    },
-    {
-      id: 3,
-      title: 'أخصائي تسويق رقمي',
-      department: 'التسويق',
-      location: 'الدمام',
-      type: 'دوام جزئي',
-      experience: 'خبير',
-      applicants: 62,
-      posted: '5 أيام',
-      salary: '10,000 - 16,000 ريال',
-      description: 'خبير في التسويق الرقمي وإدارة الحملات الإعلانية'
-    }
-  ]);
+  {
+    id: 1,
+    title: 'مطور React محترف',
+    department: 'التقنية',
+    location: 'الرياض',
+    type: 'دوام كامل',
+    experience: 'متوسط',
+    applicants: 45,
+    posted: '3 أيام',
+    salary: '12,000 - 18,000 ريال',
+    description: 'نبحث عن مطور React محترف للانضمام لفريقنا المتميز'
+  },
+  {
+    id: 2,
+    title: 'مصمم UI/UX إبداعي',
+    department: 'التصميم',
+    location: 'جدة',
+    type: 'دوام كامل',
+    experience: 'مبتدئ إلى متوسط',
+    applicants: 28,
+    posted: '1 أسبوع',
+    salary: '8,000 - 14,000 ريال',
+    description: 'مصمم مبدع لتصميم تجارب مستخدم استثنائية'
+  },
+  {
+    id: 3,
+    title: 'أخصائي تسويق رقمي',
+    department: 'التسويق',
+    location: 'الدمام',
+    type: 'دوام جزئي',
+    experience: 'خبير',
+    applicants: 62,
+    posted: '5 أيام',
+    salary: '10,000 - 16,000 ريال',
+    description: 'خبير في التسويق الرقمي وإدارة الحملات الإعلانية'
+  }]
+  );
 
   const filters = [
-    'التقنية', 'التصميم', 'التسويق', 'دوام كامل', 'دوام جزئي', 
-    'الرياض', 'جدة', 'الدمام', 'مبتدئ', 'متوسط', 'خبير'
-  ];
+  'التقنية', 'التصميم', 'التسويق', 'دوام كامل', 'دوام جزئي',
+  'الرياض', 'جدة', 'الدمام', 'مبتدئ', 'متوسط', 'خبير'];
+
 
   const toggleFilter = (filter: string) => {
-    setSelectedFilters(prev => 
-      prev.includes(filter) 
-        ? prev.filter(f => f !== filter)
-        : [...prev, filter]
+    setSelectedFilters((prev) =>
+    prev.includes(filter) ?
+    prev.filter((f) => f !== filter) :
+    [...prev, filter]
     );
   };
 
@@ -85,8 +85,8 @@ const VacancySearch: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
+          className="text-center mb-12">
+
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             اكتشف الفرص الوظيفية المتاحة
           </h2>
@@ -100,39 +100,39 @@ const VacancySearch: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
-        >
+          className="mb-8">
+
           <div className="relative mb-6">
             <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="ابحث عن وظيفة أو مهارة أو شركة..."
-              className="text-right pr-12 h-12 text-lg"
-            />
+              className="text-right pr-12 h-12 text-lg" />
+
           </div>
 
           {/* Filter Chips */}
           <div className="flex flex-wrap gap-2 justify-center">
-            {filters.map((filter) => (
-              <motion.div
-                key={filter}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+            {filters.map((filter) =>
+            <motion.div
+              key={filter}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}>
+
                 <Badge
-                  variant={selectedFilters.includes(filter) ? "default" : "outline"}
-                  className={`cursor-pointer transition-all px-4 py-2 ${
-                    selectedFilters.includes(filter)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                      : 'hover:bg-gray-100'
-                  }`}
-                  onClick={() => toggleFilter(filter)}
-                >
+                variant={selectedFilters.includes(filter) ? "default" : "outline"}
+                className={`cursor-pointer transition-all px-4 py-2 ${
+                selectedFilters.includes(filter) ?
+                'bg-gradient-to-r from-blue-500 to-purple-500 text-white' :
+                'hover:bg-gray-100'}`
+                }
+                onClick={() => toggleFilter(filter)}>
+
                   {filter}
                 </Badge>
               </motion.div>
-            ))}
+            )}
           </div>
         </motion.div>
 
@@ -141,19 +141,19 @@ const VacancySearch: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
+          transition={{ delay: 0.4 }}>
+
           <AnimatePresence>
-            {vacancies.map((vacancy, index) => (
-              <motion.div
-                key={vacancy.id}
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5, shadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-                className="bg-white rounded-2xl p-6 shadow-lg border hover:border-blue-300 transition-all duration-300 cursor-pointer"
-              >
+            {vacancies.map((vacancy, index) =>
+            <motion.div
+              key={vacancy.id}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5, shadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+              className="bg-white rounded-2xl p-6 shadow-lg border hover:border-blue-300 transition-all duration-300 cursor-pointer">
+
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-2">
                     <Badge className={getTypeColor(vacancy.type)}>
@@ -194,11 +194,11 @@ const VacancySearch: React.FC = () => {
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="hover:bg-blue-50"
-                  >
+                  <Button
+                  variant="outline"
+                  size="sm"
+                  className="hover:bg-blue-50">
+
                     عرض التفاصيل
                   </Button>
                   <span className="text-lg font-bold text-green-600">
@@ -208,11 +208,11 @@ const VacancySearch: React.FC = () => {
 
                 {/* Animated border */}
                 <motion.div
-                  className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 transition-opacity"
-                  whileHover={{ opacity: 0.1 }}
-                />
+                className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 transition-opacity"
+                whileHover={{ opacity: 0.1 }} />
+
               </motion.div>
-            ))}
+            )}
           </AnimatePresence>
         </motion.div>
 
@@ -221,21 +221,21 @@ const VacancySearch: React.FC = () => {
           className="text-center mt-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
+          transition={{ delay: 0.6 }}>
+
           <p className="text-gray-600 mb-6">
             لم تجد الوظيفة المناسبة؟ ابدأ رحلة التقديم وسنساعدك في العثور على الفرص المناسبة
           </p>
-          <Button 
+          <Button
             size="lg"
-            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 px-8"
-          >
+            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 px-8">
+
             ابدأ التقديم الآن
           </Button>
         </motion.div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default VacancySearch;

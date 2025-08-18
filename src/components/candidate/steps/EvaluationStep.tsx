@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -6,24 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Trophy, 
-  Star, 
-  TrendingUp, 
-  Target, 
   Award, 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle2, 
+  XCircle, 
+  Target,
+  Brain,
   FileText,
-  Download,
-  Share2,
-  Zap,
-  CheckCircle,
-  AlertCircle,
-  Lightbulb,
-  User,
-  Briefcase,
-  GraduationCap
+  Users,
+  Shield,
+  DollarSign
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import RadarChart from '@/components/charts/RadarChart';
+import { RadarChart } from '@/components/charts/RadarChart';
 
 interface EvaluationStepProps {
   data: any;
@@ -32,634 +27,416 @@ interface EvaluationStepProps {
   theme: string;
 }
 
-const EvaluationStep: React.FC<EvaluationStepProps> = ({ data, onComplete, persona }) => {
-  const [evaluation, setEvaluation] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(!data.completed);
-  const [progress, setProgress] = useState(0);
-  const [currentPhase, setCurrentPhase] = useState(0);
+const EvaluationStep: React.FC<EvaluationStepProps> = ({
+  data,
+  onComplete,
+  persona,
+  theme
+}) => {
+  const [evaluation, setEvaluation] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentView, setCurrentView] = useState<'overview' | 'detailed' | 'recommendations'>('overview');
   const { toast } = useToast();
 
-  const evaluationPhases = [
-    'تجميع نتائج جميع المراحل...',
-    'تحليل الأداء الشامل...',
-    'حساب النتيجة النهائية...',
-    'إعداد التوصيات المهنية...',
-    'إنشاء مسار التطوير المقترح...',
-    'إعداد التقرير النهائي...'
-  ];
-
   useEffect(() => {
-    if (isGenerating && !data.completed) {
-      generateFinalEvaluation();
+    if (data.evaluation) {
+      setEvaluation(data.evaluation);
+    } else if (data.responses && data.sessionId) {
+      loadEvaluation();
     }
-  }, []);
+  }, [data]);
 
-  const generateFinalEvaluation = async () => {
+  const loadEvaluation = async () => {
+    setIsLoading(true);
+    
     try {
-      // Simulate evaluation phases
-      for (let i = 0; i < evaluationPhases.length; i++) {
-        setCurrentPhase(i);
-        setProgress((i + 1) * 16.67);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-
-      // Generate final evaluation
-      const finalEvaluation = await createFinalEvaluation();
-      setEvaluation(finalEvaluation);
-      setIsGenerating(false);
-      setProgress(100);
-
-      toast({
-        title: "تم إكمال التقييم النهائي!",
-        description: "تم إعداد تقريرك المهني الشامل",
-        duration: 5000
+      // The evaluation should already be completed in the interview step
+      // We'll retrieve it from the database
+      const candidateData = JSON.parse(localStorage.getItem('candidateData') || '{}');
+      
+      // Get interview session data
+      const response = await window.ezsite.apis.tablePage(35306, {
+        PageNo: 1,
+        PageSize: 1,
+        Filters: [
+          { name: "candidate_id", op: "Equal", value: candidateData.id },
+          { name: "session_id", op: "Equal", value: data.sessionId }
+        ]
       });
 
+      if (response.data?.List?.[0]) {
+        const sessionData = response.data.List[0];
+        
+        // Mock evaluation based on interview scores (in real implementation, this would come from Gemini API)
+        const mockEvaluation = {
+          overallScore: sessionData.interview_score || 75,
+          communicationScore: sessionData.communication_score || 80,
+          technicalScore: sessionData.technical_response_score || 70,
+          experienceScore: 72,
+          problemSolvingScore: 75,
+          culturalFitScore: 80,
+          detailedFeedback: data.responses?.map((r: any, i: number) => ({
+            questionId: r.questionId,
+            question: r.question,
+            score: 70 + Math.random() * 25, // Random score for demo
+            feedback: "إجابة جيدة تُظهر فهماً للمفاهيم الأساسية، ولكن يمكن تحسينها بإضافة المزيد من التفاصيل العملية",
+            strengths: ["وضوح في التعبير", "فهم أساسي جيد"],
+            improvements: ["إضافة أمثلة عملية أكثر", "تفصيل الخبرات السابقة"]
+          })) || [],
+          overallAssessment: `المرشح يُظهر إمكانيات جيدة في المجال الطبي مع فهم أساسي للمتطلبات. يحتاج لتطوير بعض الجوانب ولكنه مرشح واعد لشركة ميس للمشاريع الطبية. النتيجة العامة ${sessionData.interview_score || 75}% تضعه في فئة المرشحين المقبولين مع شروط للتطوير.`,
+          recommendation: sessionData.interview_score >= 80 ? "توظيف فوري" : sessionData.interview_score >= 65 ? "توظيف مشروط" : sessionData.interview_score >= 50 ? "قائمة انتظار" : "رفض مهذب",
+          nextSteps: [
+            "مراجعة مع فريق التوظيف في شركة ميس",
+            "إجراء مقابلة تقنية متخصصة",
+            "فحص المراجع والشهادات",
+            "تحديد البرنامج التدريبي المناسب"
+          ],
+          redFlags: sessionData.interview_score < 60 ? [
+            "نقص في الخبرة العملية المتخصصة",
+            "عدم وضوح في بعض الإجابات",
+            "حاجة لتطوير المهارات التقنية"
+          ] : [],
+          positiveIndicators: [
+            "حماس واضح للعمل في المجال الطبي",
+            "قدرة على التعلم والتطوير",
+            "التزام بالمعايير المهنية",
+            "رغبة في العمل مع شركة ميس"
+          ]
+        };
+
+        setEvaluation(mockEvaluation);
+      }
     } catch (error) {
-      setIsGenerating(false);
+      console.error('Evaluation loading error:', error);
       toast({
-        title: "خطأ في التقييم",
-        description: "حدث خطأ أثناء إعداد التقييم النهائي",
-        variant: "destructive"
+        title: "خطأ في تحميل التقييم",
+        description: "حدث خطأ أثناء تحميل نتائج التقييم",
+        variant: "destructive",
+        duration: 3000
       });
     }
-  };
-
-  const createFinalEvaluation = async () => {
-    // Mock comprehensive evaluation based on all steps
-    return {
-      overallScore: Math.floor(Math.random() * 15) + 85, // 85-99
-      finalGrade: 'A',
-      ranking: 'متميز',
-      
-      stepScores: {
-        basicInfo: 95,
-        cvAnalysis: data.analysisScore || 87,
-        challenge: data.challengeScore || 85,
-        interview: data.interviewScore || 90,
-        overall: Math.floor(Math.random() * 15) + 85
-      },
-
-      competencyAssessment: {
-        technical: Math.floor(Math.random() * 20) + 80,
-        communication: Math.floor(Math.random() * 15) + 82,
-        problemSolving: Math.floor(Math.random() * 18) + 85,
-        teamwork: Math.floor(Math.random() * 10) + 88,
-        leadership: Math.floor(Math.random() * 25) + 75,
-        adaptability: Math.floor(Math.random() * 12) + 83
-      },
-
-      radarData: {
-        labels: ['المهارات التقنية', 'التواصل', 'حل المشكلات', 'العمل الجماعي', 'القيادة', 'التكيف'],
-        data: [85, 82, 88, 90, 78, 85]
-      },
-
-      strengths: [
-        'أداء متميز في التحديات التقنية',
-        'مهارات تواصل فعالة وواضحة',
-        'قدرة قوية على حل المشكلات المعقدة',
-        'التزام عالي بالجودة والتطوير المستمر',
-        'شخصية إيجابية ومتعاونة'
-      ],
-
-      areasForImprovement: [
-        {
-          area: 'المهارات القيادية',
-          priority: 'متوسط',
-          suggestion: 'المشاركة في مشاريع قيادية والحصول على تدريب إداري',
-          timeline: '6-12 شهر'
-        },
-        {
-          area: 'المعرفة بأحدث التقنيات',
-          priority: 'عالي',
-          suggestion: 'أخذ دورات متخصصة والمشاركة في المجتمعات التقنية',
-          timeline: '3-6 أشهر'
-        },
-        {
-          area: 'الشبكات المهنية',
-          priority: 'منخفض',
-          suggestion: 'المشاركة في الفعاليات المهنية وبناء علاقات في المجال',
-          timeline: 'مستمر'
-        }
-      ],
-
-      careerPath: {
-        currentLevel: getCareerLevel(persona),
-        nextSteps: getCareerNextSteps(persona),
-        timeline: '1-2 سنوات',
-        requiredSkills: getRequiredSkills(persona)
-      },
-
-      jobRecommendations: [
-        {
-          title: getPersonaJobTitle(persona, 'senior'),
-          company: 'شركة تقنية رائدة',
-          match: '95%',
-          salaryRange: '15,000 - 25,000 ريال',
-          location: 'الرياض، السعودية'
-        },
-        {
-          title: getPersonaJobTitle(persona, 'lead'),
-          company: 'ستارت أب ناشئ',
-          match: '88%',
-          salaryRange: '18,000 - 28,000 ريال',
-          location: 'دبي، الإمارات'
-        },
-        {
-          title: getPersonaJobTitle(persona, 'consultant'),
-          company: 'شركة استشارية',
-          match: '82%',
-          salaryRange: '20,000 - 30,000 ريال',
-          location: 'عن بُعد'
-        }
-      ],
-
-      certificationRecommendations: getCertificationRecommendations(persona),
-      
-      personalizedTips: getPersonalizedTips(persona),
-
-      reportSummary: `تقييم شامل لمرشح ${persona === 'developer' ? 'مطور' : persona === 'designer' ? 'مصمم' : 'مسوق'} متميز يظهر إمكانات كبيرة للنمو والتطور في المجال المهني. الأداء العام ممتاز مع توصيات محددة للتطوير المستمر.`,
-
-      nextStepsRecommendation: [
-        'مراجعة التقرير المفصل والتوصيات',
-        'البدء في تطبيق خطة التطوير المقترحة',
-        'التواصل مع الشركات المقترحة',
-        'المتابعة الدورية للتقدم المهني'
-      ]
-    };
-  };
-
-  const getCareerLevel = (persona: string) => {
-    const levels = {
-      developer: 'مطور متقدم',
-      designer: 'مصمم أول',
-      marketer: 'أخصائي تسويق أول'
-    };
-    return levels[persona] || 'متخصص أول';
-  };
-
-  const getCareerNextSteps = (persona: string) => {
-    const steps = {
-      developer: ['قائد فريق تطوير', 'مهندس معماري', 'مدير تقني'],
-      designer: ['قائد فريق تصميم', 'مدير إبداعي', 'مستشار تصميم'],
-      marketer: ['مدير تسويق', 'استراتيجي تسويق', 'مدير عام التسويق']
-    };
-    return steps[persona] || ['قائد فريق', 'مدير', 'مستشار'];
-  };
-
-  const getRequiredSkills = (persona: string) => {
-    const skills = {
-      developer: ['قيادة الفرق', 'هندسة البرمجيات', 'DevOps', 'الذكاء الاصطناعي'],
-      designer: ['استراتيجية التصميم', 'أبحاث المستخدم', 'إدارة المنتجات', 'العلامة التجارية'],
-      marketer: ['التحليل المتقدم', 'التسويق الرقمي', 'إدارة العلاقات', 'الذكاء التجاري']
-    };
-    return skills[persona] || ['مهارات قيادية', 'تحليل البيانات', 'إدارة المشاريع'];
-  };
-
-  const getPersonaJobTitle = (persona: string, level: string) => {
-    const titles = {
-      developer: {
-        senior: 'مطور برمجيات أول',
-        lead: 'قائد فريق التطوير',
-        consultant: 'مستشار تقني'
-      },
-      designer: {
-        senior: 'مصمم أول',
-        lead: 'قائد فريق التصميم',
-        consultant: 'مستشار تصميم'
-      },
-      marketer: {
-        senior: 'أخصائي تسويق أول',
-        lead: 'مدير تسويق',
-        consultant: 'مستشار تسويقي'
-      }
-    };
-    return titles[persona]?.[level] || 'متخصص أول';
-  };
-
-  const getCertificationRecommendations = (persona: string) => {
-    const certs = {
-      developer: [
-        { name: 'AWS Solutions Architect', priority: 'عالي', duration: '3-6 أشهر' },
-        { name: 'Google Cloud Professional', priority: 'متوسط', duration: '2-4 أشهر' },
-        { name: 'Kubernetes Administrator', priority: 'متوسط', duration: '2-3 أشهر' }
-      ],
-      designer: [
-        { name: 'Google UX Design Certificate', priority: 'عالي', duration: '4-6 أشهر' },
-        { name: 'Adobe Certified Expert', priority: 'متوسط', duration: '2-3 أشهر' },
-        { name: 'Design Leadership Certificate', priority: 'منخفض', duration: '1-2 شهر' }
-      ],
-      marketer: [
-        { name: 'Google Ads Certification', priority: 'عالي', duration: '1-2 شهر' },
-        { name: 'HubSpot Content Marketing', priority: 'متوسط', duration: '2-3 أشهر' },
-        { name: 'Facebook Blueprint', priority: 'عالي', duration: '2-4 أشهر' }
-      ]
-    };
-    return certs[persona] || [];
-  };
-
-  const getPersonalizedTips = (persona: string) => {
-    const tips = {
-      developer: [
-        'احرص على مواكبة أحدث التقنيات والأدوات',
-        'ساهم في مشاريع مفتوحة المصدر لبناء سمعتك',
-        'طور مهارات التواصل والعرض التقديمي',
-        'تعلم أساسيات إدارة المنتجات'
-      ],
-      designer: [
-        'اعتمد على البحث والبيانات في قراراتك التصميمية',
-        'تطوير مهارات الـ Prototyping والـ User Testing',
-        'تعلم أساسيات التطوير لتحسين التعاون مع المطورين',
-        'اهتم ببناء محفظة أعمال قوية ومتنوعة'
-      ],
-      marketer: [
-        'اتقن استخدام أدوات التحليل والبيانات',
-        'طور مهارات السرد والمحتوى الإبداعي',
-        'تعلم أساسيات التصميم لتحسين الحملات',
-        'اهتم بفهم رحلة العميل بشكل عميق'
-      ]
-    };
-    return tips[persona] || [];
-  };
-
-  const getPersonaColor = () => {
-    switch (persona) {
-      case 'designer': return 'from-pink-500 to-purple-500';
-      case 'marketer': return 'from-green-500 to-blue-500';
-      default: return 'from-blue-500 to-cyan-500';
-    }
-  };
-
-  const getGradeColor = (grade: string) => {
-    switch (grade) {
-      case 'A': return 'text-green-600 bg-green-100';
-      case 'B': return 'text-blue-600 bg-blue-100';
-      case 'C': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-red-600 bg-red-100';
-    }
+    
+    setIsLoading(false);
   };
 
   const handleComplete = () => {
-    const finalData = {
-      ...data,
-      evaluation,
-      completed: true,
-      completedAt: new Date().toISOString()
-    };
-    
-    onComplete(finalData);
+    onComplete({ evaluation, completed: true });
   };
 
-  const handleDownloadReport = () => {
-    toast({
-      title: "تحميل التقرير",
-      description: "سيتم إرسال التقرير المفصل عبر البريد الإلكتروني",
-      duration: 5000
-    });
+  const getPersonaGradient = () => {
+    switch (persona) {
+      case 'medical':
+        return 'from-green-500 to-blue-600';
+      case 'designer':
+        return 'from-pink-400 to-purple-600';
+      case 'marketer':
+        return 'from-green-400 to-blue-600';
+      default:
+        return 'from-green-500 to-blue-600';
+    }
   };
 
-  const handleShareResults = () => {
-    navigator.clipboard.writeText(`حصلت على تقييم ${evaluation?.ranking} بنسبة ${evaluation?.overallScore}% في بوابة المرشحين!`);
-    toast({
-      title: "تم نسخ الرابط",
-      description: "يمكنك مشاركة نتائجك الآن",
-      duration: 3000
-    });
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 65) return 'text-blue-600';
+    if (score >= 50) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
-  if (isGenerating) {
+  const getScoreIcon = (score: number) => {
+    if (score >= 80) return <CheckCircle2 className="w-5 h-5 text-green-600" />;
+    if (score >= 65) return <Target className="w-5 h-5 text-blue-600" />;
+    if (score >= 50) return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+    return <XCircle className="w-5 h-5 text-red-600" />;
+  };
+
+  const getRecommendationColor = (rec: string) => {
+    if (rec.includes('فوري')) return 'bg-green-100 text-green-700 border-green-200';
+    if (rec.includes('مشروط')) return 'bg-blue-100 text-blue-700 border-blue-200';
+    if (rec.includes('انتظار')) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    return 'bg-red-100 text-red-700 border-red-200';
+  };
+
+  if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        <div className="text-center mb-8">
-          <motion.div
-            animate={{ 
-              rotate: 360,
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-              scale: { duration: 1.5, repeat: Infinity }
-            }}
-            className="inline-block mb-4"
-          >
-            <Trophy className="w-16 h-16 text-yellow-500" />
-          </motion.div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            جاري إعداد التقييم النهائي
-          </h3>
-          <p className="text-gray-600">
-            يتم تحليل جميع النتائج وإعداد تقريرك الشامل
-          </p>
+      <div className="space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <Brain className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-pulse" />
+          <h2 className="text-3xl font-bold mb-2 text-gray-800">جاري تحليل وتقييم إجاباتك</h2>
+          <p className="text-gray-600">يرجى الانتظار بينما نعد تقريرك الشامل...</p>
+        </motion.div>
+        <div className="flex justify-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
-
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
-              <Zap className="w-6 h-6 text-purple-500" />
-            </motion.div>
-            <span className="font-semibold text-gray-800">
-              {evaluationPhases[currentPhase]}
-            </span>
-          </div>
-          
-          <Progress value={progress} className="w-full h-3 mb-3" />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>{Math.round(progress)}%</span>
-            <span>المرحلة {currentPhase + 1} من {evaluationPhases.length}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {['تحليل البيانات', 'حساب النتائج', 'إعداد التوصيات'].map((item, index) => (
-            <motion.div
-              key={item}
-              className="bg-white p-4 rounded-lg shadow border"
-              animate={{
-                scale: currentPhase >= index ? [1, 1.05, 1] : 1,
-                backgroundColor: currentPhase >= index ? ["#ffffff", "#f3f4f6", "#ffffff"] : "#ffffff"
-              }}
-              transition={{
-                duration: 1,
-                repeat: currentPhase >= index ? Infinity : 0,
-                repeatType: "reverse"
-              }}
-            >
-              <div className="text-center">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                  {currentPhase > index ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <TrendingUp className="w-4 h-4 text-blue-600" />
-                  )}
-                </div>
-                <p className="font-medium text-gray-700">{item}</p>
-                {currentPhase > index && (
-                  <motion.p 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-green-600 text-sm mt-1"
-                  >
-                    ✓ اكتمل
-                  </motion.p>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      </div>
     );
   }
 
   if (!evaluation) {
-    return <div>حدث خطأ في تحميل التقييم</div>;
+    return (
+      <div className="text-center py-8">
+        <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
+        <p className="text-gray-600">لم يتم العثور على نتائج التقييم</p>
+      </div>
+    );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
-      {/* Header */}
-      <div className="text-center">
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="inline-block mb-4"
-        >
-          <div className="relative">
-            <Trophy className="w-20 h-20 text-yellow-500" />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="absolute -top-2 -right-2"
-            >
-              <Star className="w-8 h-8 text-yellow-400" />
-            </motion.div>
-          </div>
-        </motion.div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
-          التقييم النهائي مكتمل!
-        </h3>
-        <p className="text-gray-600 text-lg">
-          مبروك! إليك نتائجك الشاملة وتوصياتك المهنية
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center"
+      >
+        <Award className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-r ${getPersonaGradient()} bg-clip-text text-transparent`} />
+        <h2 className="text-3xl font-bold mb-2 text-gray-800">
+          التقييم النهائي - شركة ميس
+        </h2>
+        <p className="text-gray-600">
+          تقييم شامل وصادق لأدائك في عملية التقديم
         </p>
+      </motion.div>
+
+      {/* Navigation */}
+      <div className="flex justify-center">
+        <div className="inline-flex rounded-lg bg-gray-100 p-1">
+          <button
+            onClick={() => setCurrentView('overview')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              currentView === 'overview'
+                ? `bg-gradient-to-r ${getPersonaGradient()} text-white shadow`
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            نظرة عامة
+          </button>
+          <button
+            onClick={() => setCurrentView('detailed')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              currentView === 'detailed'
+                ? `bg-gradient-to-r ${getPersonaGradient()} text-white shadow`
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            تفاصيل الأسئلة
+          </button>
+          <button
+            onClick={() => setCurrentView('recommendations')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              currentView === 'recommendations'
+                ? `bg-gradient-to-r ${getPersonaGradient()} text-white shadow`
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            التوصيات
+          </button>
+        </div>
       </div>
 
-      {/* Overall Score */}
-      <Card className="p-8 bg-gradient-to-r from-blue-50 to-purple-50">
-        <div className="text-center">
+      <AnimatePresence mode="wait">
+        {currentView === 'overview' && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 150 }}
-            className="relative inline-block mb-6"
+            key="overview"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
           >
-            <div className={`w-32 h-32 rounded-full bg-gradient-to-r ${getPersonaColor()} flex items-center justify-center mx-auto shadow-lg`}>
-              <span className="text-4xl font-bold text-white">
-                {evaluation.overallScore}
-              </span>
+            {/* Overall Score */}
+            <Card className="p-6 text-center bg-gradient-to-br from-blue-50 to-green-50">
+              <div className="flex items-center justify-center mb-4">
+                {getScoreIcon(evaluation.overallScore)}
+                <h3 className="text-2xl font-bold text-gray-800 mr-2">النتيجة الإجمالية</h3>
+              </div>
+              <div className={`text-6xl font-bold mb-4 ${getScoreColor(evaluation.overallScore)}`}>
+                {evaluation.overallScore}%
+              </div>
+              <div className={`inline-block px-4 py-2 rounded-full text-lg font-semibold border-2 ${getRecommendationColor(evaluation.recommendation)}`}>
+                {evaluation.recommendation}
+              </div>
+            </Card>
+
+            {/* Score Breakdown */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { name: 'التواصل', score: evaluation.communicationScore, icon: Users },
+                { name: 'المهارات التقنية', score: evaluation.technicalScore, icon: Brain },
+                { name: 'الخبرة العملية', score: evaluation.experienceScore, icon: Award },
+                { name: 'حل المشكلات', score: evaluation.problemSolvingScore, icon: Target },
+                { name: 'الملاءمة الثقافية', score: evaluation.culturalFitScore, icon: Shield },
+              ].map((item, index) => (
+                <Card key={index} className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="w-5 h-5 text-gray-600" />
+                      <span className="font-medium text-gray-800">{item.name}</span>
+                    </div>
+                    <span className={`font-bold ${getScoreColor(item.score)}`}>
+                      {item.score}%
+                    </span>
+                  </div>
+                  <Progress value={item.score} className="h-2" />
+                </Card>
+              ))}
             </div>
-            <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-sm font-bold ${getGradeColor(evaluation.finalGrade)}`}>
-              {evaluation.finalGrade}
+
+            {/* Overall Assessment */}
+            <Card className="p-6">
+              <h4 className="text-xl font-semibold mb-4 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-500" />
+                التقييم الشامل
+              </h4>
+              <div className="bg-gray-50 rounded-lg p-4 border-r-4 border-blue-500">
+                <p className="text-gray-700 leading-relaxed">{evaluation.overallAssessment}</p>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
+        {currentView === 'detailed' && (
+          <motion.div
+            key="detailed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
+            <h3 className="text-2xl font-bold text-gray-800 text-center">تقييم تفصيلي للإجابات</h3>
+            <div className="space-y-4">
+              {evaluation.detailedFeedback?.map((feedback: any, index: number) => (
+                <Card key={index} className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800 mb-2">
+                          السؤال {feedback.questionId}
+                        </h4>
+                        <p className="text-gray-600 text-sm mb-3">{feedback.question}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getScoreIcon(feedback.score)}
+                        <span className={`font-bold text-lg ${getScoreColor(feedback.score)}`}>
+                          {Math.round(feedback.score)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <p className="text-blue-800 text-sm">{feedback.feedback}</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <h5 className="font-semibold text-green-700 text-sm mb-2">نقاط القوة:</h5>
+                        <ul className="text-green-600 text-sm space-y-1">
+                          {feedback.strengths?.map((strength: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <CheckCircle2 className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                              {strength}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-yellow-700 text-sm mb-2">نقاط التحسين:</h5>
+                        <ul className="text-yellow-600 text-sm space-y-1">
+                          {feedback.improvements?.map((improvement: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                              {improvement}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           </motion.div>
-          
-          <h4 className="text-xl font-bold text-gray-800 mb-2">النتيجة الإجمالية</h4>
-          <Badge className="bg-green-100 text-green-800 text-lg px-4 py-1">
-            {evaluation.ranking}
-          </Badge>
-        </div>
-      </Card>
+        )}
 
-      {/* Step Breakdown */}
-      <Card className="p-6">
-        <h4 className="text-lg font-semibold text-gray-800 mb-6 text-center">تفصيل النتائج</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(evaluation.stepScores).map(([step, score], index) => {
-            const stepNames = {
-              basicInfo: 'المعلومات الأساسية',
-              cvAnalysis: 'تحليل السيرة الذاتية', 
-              challenge: 'التحدي المهني',
-              interview: 'المقابلة التفاعلية',
-              overall: 'التقييم الشامل'
-            };
-            
-            const stepIcons = {
-              basicInfo: <User className="w-5 h-5" />,
-              cvAnalysis: <FileText className="w-5 h-5" />,
-              challenge: <Target className="w-5 h-5" />,
-              interview: <Briefcase className="w-5 h-5" />,
-              overall: <Award className="w-5 h-5" />
-            };
+        {currentView === 'recommendations' && (
+          <motion.div
+            key="recommendations"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Next Steps */}
+              <Card className="p-6">
+                <h4 className="text-xl font-semibold mb-4 flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2 text-green-500" />
+                  الخطوات التالية
+                </h4>
+                <ul className="space-y-3">
+                  {evaluation.nextSteps?.map((step: string, index: number) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <span className="text-gray-700">{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
 
-            return (
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center p-4 bg-white rounded-lg shadow border"
-              >
-                <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${getPersonaColor()} flex items-center justify-center text-white mx-auto mb-2`}>
-                  {stepIcons[step]}
-                </div>
-                <div className="text-2xl font-bold text-gray-800">{score}</div>
-                <p className="text-sm text-gray-600">{stepNames[step]}</p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </Card>
+              {/* Positive Indicators */}
+              <Card className="p-6">
+                <h4 className="text-xl font-semibold mb-4 flex items-center">
+                  <CheckCircle2 className="w-5 h-5 mr-2 text-green-500" />
+                  المؤشرات الإيجابية
+                </h4>
+                <ul className="space-y-2">
+                  {evaluation.positiveIndicators?.map((indicator: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700 text-sm">{indicator}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
 
-      {/* Competency Assessment */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-            تقييم الكفاءات
-          </h4>
-          <RadarChart data={evaluation.radarData} />
-        </Card>
+            {/* Red Flags */}
+            {evaluation.redFlags?.length > 0 && (
+              <Card className="p-6 border-yellow-200 bg-yellow-50">
+                <h4 className="text-xl font-semibold mb-4 flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
+                  نقاط تحتاج انتباه
+                </h4>
+                <ul className="space-y-2">
+                  {evaluation.redFlags.map((flag: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-yellow-800 text-sm">{flag}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4">نقاط القوة</h4>
-          <div className="space-y-3">
-            {evaluation.strengths.map((strength: string, index: number) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-3"
-              >
-                <Star className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                <span className="text-gray-700">{strength}</span>
-              </motion.div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Areas for Improvement */}
-      <Card className="p-6">
-        <h4 className="text-lg font-semibold text-gray-800 mb-4">مجالات التطوير</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {evaluation.areasForImprovement.map((area: any, index: number) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-blue-50 p-4 rounded-lg border border-blue-200"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-4 h-4 text-blue-600" />
-                <span className="font-semibold text-blue-800">{area.area}</span>
-                <Badge variant="outline" className={`text-xs ${
-                  area.priority === 'عالي' ? 'border-red-300 text-red-700' :
-                  area.priority === 'متوسط' ? 'border-yellow-300 text-yellow-700' :
-                  'border-green-300 text-green-700'
-                }`}>
-                  {area.priority}
-                </Badge>
-              </div>
-              <p className="text-sm text-blue-700 mb-2">{area.suggestion}</p>
-              <div className="flex items-center gap-2 text-xs text-blue-600">
-                <Clock className="w-3 h-3" />
-                <span>{area.timeline}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Job Recommendations */}
-      <Card className="p-6">
-        <h4 className="text-lg font-semibold text-gray-800 mb-4">الوظائف المقترحة</h4>
-        <div className="space-y-4">
-          {evaluation.jobRecommendations.map((job: any, index: number) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
-            >
-              <div className="flex-1">
-                <h5 className="font-semibold text-gray-800">{job.title}</h5>
-                <p className="text-sm text-gray-600">{job.company} • {job.location}</p>
-                <p className="text-sm text-blue-600 font-medium">{job.salaryRange}</p>
-              </div>
-              <Badge className={`${
-                parseInt(job.match) >= 90 ? 'bg-green-100 text-green-800' :
-                parseInt(job.match) >= 80 ? 'bg-blue-100 text-blue-800' :
-                'bg-yellow-100 text-yellow-800'
-              }`}>
-                {job.match} مطابقة
-              </Badge>
-            </motion.div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-4 justify-center">
-        <Button
-          onClick={handleDownloadReport}
-          variant="outline"
-          size="lg"
-          className="px-8"
-        >
-          <Download className="w-5 h-5 ml-2" />
-          تحميل التقرير المفصل
-        </Button>
-        
-        <Button
-          onClick={handleShareResults}
-          variant="outline"
-          size="lg"
-          className="px-8"
-        >
-          <Share2 className="w-5 h-5 ml-2" />
-          مشاركة النتائج
-        </Button>
-        
+      <div className="text-center">
         <Button
           onClick={handleComplete}
-          size="lg"
-          className={`px-12 bg-gradient-to-r ${getPersonaColor()}`}
+          className={`bg-gradient-to-r ${getPersonaGradient()} hover:opacity-90 text-white px-8 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}
         >
-          <Trophy className="w-5 h-5 ml-2" />
-          إكمال التقديم
+          إنهاء عملية التقديم
         </Button>
+        <p className="text-sm text-gray-600 mt-3">
+          شكراً لك على وقتك. ستتم مراجعة طلبك وسيتم التواصل معك قريباً.
+        </p>
       </div>
-
-      {/* Summary */}
-      <Card className="p-6 bg-gradient-to-r from-purple-50 to-blue-50">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">ملخص التقييم</h4>
-        <p className="text-gray-700 leading-relaxed mb-4">{evaluation.reportSummary}</p>
-        
-        <div className="bg-white p-4 rounded-lg">
-          <h5 className="font-semibold text-gray-800 mb-2">الخطوات التالية المقترحة:</h5>
-          <ul className="space-y-1">
-            {evaluation.nextStepsRecommendation.map((step: string, index: number) => (
-              <li key={index} className="flex items-center gap-2 text-gray-700 text-sm">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span>{step}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Card>
-    </motion.div>
+    </div>
   );
 };
 

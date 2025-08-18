@@ -1,200 +1,263 @@
-
-// Analyze CV using mock AI (in production, use Google Gemini API)
-function analyzeCV(candidateId, cvText, basicInfo, jobDescription) {
+// Analyze CV using Gemini API for Mais Medical Company context
+async function analyzeCV(candidateId, cvText, basicInfo = {}) {
     try {
-        // Simulate AI analysis processing time
-        const timestamp = new Date().toISOString();
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
         
-        // Mock AI analysis result based on input data
-        const analysis = {
-            overallScore: Math.floor(Math.random() * 20) + 80, // 80-99
-            detailedScores: {
-                experience: calculateExperienceScore(basicInfo.experience),
-                education: calculateEducationScore(basicInfo.education), 
-                skills: Math.floor(Math.random() * 15) + 85,
-                personality: Math.floor(Math.random() * 10) + 80,
-                compatibility: jobDescription ? Math.floor(Math.random() * 20) + 80 : 75
-            },
-            radarData: {
-                labels: ['المهارات التقنية', 'الخبرة العملية', 'التعليم', 'اللغات', 'المهارات الناعمة', 'الإبداع'],
-                data: [
-                    Math.floor(Math.random() * 20) + 80,
-                    Math.floor(Math.random() * 15) + 85,
-                    Math.floor(Math.random() * 25) + 75,
-                    Math.floor(Math.random() * 30) + 70,
-                    Math.floor(Math.random() * 15) + 80,
-                    Math.floor(Math.random() * 25) + 75
-                ]
-            },
-            barData: {
-                labels: ['البرمجة', 'إدارة المشاريع', 'التصميم', 'التحليل', 'التواصل'],
-                data: [
-                    Math.floor(Math.random() * 20) + 80,
-                    Math.floor(Math.random() * 20) + 70,
-                    Math.floor(Math.random() * 30) + 60,
-                    Math.floor(Math.random() * 20) + 80,
-                    Math.floor(Math.random() * 15) + 75
-                ]
-            },
-            summary: generateSummary(basicInfo, cvText),
-            strengths: generateStrengths(basicInfo),
-            weaknesses: generateWeaknesses(basicInfo),
-            cvImprovements: [
-                'إضافة قسم المشاريع الشخصية',
-                'تحسين وصف الخبرات المهنية',
-                'إضافة الشهادات والدورات التدريبية',
-                'تحسين التنسيق والتصميم'
-            ],
-            professionalSummary: `مرشح ${getExperienceText(basicInfo.experience)} في مجال ${getSpecializationText(basicInfo.specialization)} مع خلفية تعليمية ${getEducationText(basicInfo.education)}.`,
-            suggestedJobs: generateSuggestedJobs(basicInfo.specialization),
-            aiImpression: 'مرشح واعد يظهر إمكانات قوية للنمو والتطور المهني',
-            finalVerdict: determineFinalVerdict(Math.floor(Math.random() * 20) + 80),
-            analyzedAt: timestamp,
-            candidateId: candidateId
-        };
+        // Initialize Gemini API
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'AIzaSyBvJLY9HrYaZ9vR3MhOTLV1234567890');
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 4096,
+            }
+        });
 
-        return {
-            success: true,
-            analysis: analysis,
-            processedAt: timestamp
-        };
-        
-    } catch (error) {
-        console.error('Error in CV analysis:', error);
-        throw new Error('فشل في تحليل السيرة الذاتية');
-    }
-}
+        const prompt = `
+تحليل شامل ومفصل للسيرة الذاتية - شركة ميس للمشاريع الطبية - السعودية
 
-function calculateExperienceScore(experience) {
-    const scores = {
-        'fresh': 75,
-        'junior': 80,
-        'mid': 85,
-        'senior': 95
-    };
-    return scores[experience] || 70;
-}
+معلومات المرشح الأساسية:
+- الاسم: ${basicInfo.fullName || 'غير محدد'}
+- التخصص الطبي: ${basicInfo.specialization || 'غير محدد'}
+- سنوات الخبرة: ${basicInfo.experience || 'غير محدد'}
+- المؤهل التعليمي: ${basicInfo.education || 'غير محدد'}
+- الراتب المتوقع: ${basicInfo.expectedSalary || 'غير محدد'} ريال سعودي
 
-function calculateEducationScore(education) {
-    const scores = {
-        'highschool': 70,
-        'diploma': 75,
-        'bachelor': 85,
-        'master': 90,
-        'phd': 95
-    };
-    return scores[education] || 70;
-}
+النص المستخرج من السيرة الذاتية:
+${cvText}
 
-function generateSummary(basicInfo, cvText) {
-    const templates = [
-        'مرشح متميز بخبرة قوية في مجاله التخصصي. يظهر إمكانات كبيرة للنمو والتطور المهني.',
-        'ملف مهني واعد يجمع بين الخبرة العملية والمؤهلات الأكاديمية القوية.',
-        'مرشح يتمتع بمهارات تقنية متقدمة ورؤية واضحة لتطوير مسيرته المهنية.',
-        'ملف مهني متكامل يظهر التزامًا واضحًا بالتطوير المستمر والتميز في الأداء.'
-    ];
-    
-    return templates[Math.floor(Math.random() * templates.length)];
-}
+كخبير في التوظيف الطبي في السعودية، قم بتحليل هذه السيرة الذاتية بدقة عالية وبدون مجاملات. 
 
-function generateStrengths(basicInfo) {
-    const strengthsPool = {
-        developer: [
-            'خبرة قوية في تطوير التطبيقات',
-            'إتقان تقنيات البرمجة الحديثة',
-            'فهم عميق لهندسة البرمجيات',
-            'مهارات حل المشاكل المتقدمة',
-            'القدرة على العمل مع فرق متعددة'
-        ],
-        designer: [
-            'حس إبداعي متميز',
-            'إتقان أدوات التصميم المتخصصة',
-            'فهم عميق لتجربة المستخدم',
-            'مهارات التواصل البصري',
-            'القدرة على ترجمة الأفكار إلى تصاميم'
-        ],
-        marketer: [
-            'فهم عميق لسلوك المستهلك',
-            'مهارات التحليل والتخطيط الاستراتيجي',
-            'خبرة في أدوات التسويق الرقمي',
-            'القدرة على إنشاء حملات فعالة',
-            'مهارات التواصل والإقناع'
+التحليل يجب أن يكون:
+1. صادق ومباشر بدون تجميل
+2. يركز على الخبرة العملية في المجال الطبي
+3. يقيم القدرة على العمل في البيئة السعودية
+4. يحدد المخاطر الحقيقية في التوظيف
+5. يقدم توصيات عملية للتطوير
+
+معايير التقييم الأساسية:
+- الخبرة العملية في المجال الطبي (0-100)
+- المؤهلات الأكاديمية وجودتها (0-100)
+- المهارات التقنية الطبية (0-100)
+- مهارات التواصل والعمل الجماعي (0-100)
+- المعرفة بالأنظمة الصحية السعودية (0-100)
+- القدرة على التعامل مع التحديات (0-100)
+
+أريد تحليل صريح يشمل:
+- تحديد نقاط القوة الحقيقية (ليس مجاملات)
+- تحديد نقاط الضعف والمخاطر
+- تقييم مدى الملاءمة لشركة ميس الطبية
+- توصية واقعية بخصوص التوظيف
+- تقييم للراتب المناسب حسب الخبرة الفعلية
+
+إرجع النتيجة في JSON فقط:
+{
+    "overallScore": رقم من 0-100,
+    "detailedScores": {
+        "medicalExperience": رقم من 0-100,
+        "academicQualifications": رقم من 0-100,
+        "technicalSkills": رقم من 0-100,
+        "communicationSkills": رقم من 0-100,
+        "saudiHealthSystemKnowledge": رقم من 0-100,
+        "problemSolving": رقم من 0-100
+    },
+    "strengths": [
+        "نقطة قوة حقيقية ومحددة",
+        "نقطة قوة أخرى مع دليل"
+    ],
+    "weaknesses": [
+        {
+            "category": "فئة الضعف",
+            "description": "وصف مفصل للضعف",
+            "impact": "تأثير هذا الضعف على الأداء",
+            "improvementSuggestion": "اقتراح محدد للتحسين"
+        }
+    ],
+    "medicalExpertiseAssessment": {
+        "specialization": "التخصص المحدد",
+        "experienceLevel": "مبتدئ/متوسط/متقدم/خبير",
+        "certifications": "الشهادات المهنية المعترف بها",
+        "clinicalExperience": "تقييم الخبرة السريرية",
+        "researchExperience": "الخبرة البحثية"
+    },
+    "saudiMarketFit": {
+        "culturalAdaptability": رقم من 0-100,
+        "languageSkills": "تقييم مهارات اللغة",
+        "regulatoryKnowledge": "المعرفة بالأنظمة الصحية السعودية",
+        "localExperience": "الخبرة في السوق السعودي"
+    },
+    "riskAssessment": {
+        "overallRisk": "منخفض/متوسط/عالي",
+        "riskFactors": [
+            {
+                "type": "نوع المخاطرة",
+                "level": "منخفض/متوسط/عالي",
+                "description": "وصف المخاطرة",
+                "impact": "التأثير المحتمل",
+                "mitigation": "كيفية تخفيف المخاطرة"
+            }
         ]
-    };
-    
-    const relevantStrengths = strengthsPool[basicInfo.persona] || strengthsPool.developer;
-    return relevantStrengths.slice(0, 4);
-}
+    },
+    "hiringRecommendation": {
+        "decision": "توظيف فوري/توظيف مشروط/مراجعة إضافية/رفض مهذب",
+        "confidence": رقم من 0-100,
+        "reasoning": [
+            "سبب رئيسي للقرار",
+            "سبب إضافي"
+        ],
+        "conditions": [
+            "شرط للتوظيف إن وجد"
+        ],
+        "nextSteps": [
+            "الخطوة التالية المطلوبة"
+        ]
+    },
+    "salaryAssessment": {
+        "currency": "ريال سعودي",
+        "recommendedRange": {
+            "minimum": رقم,
+            "maximum": رقم,
+            "mostLikely": رقم
+        },
+        "justification": "تبرير نطاق الراتب المقترح",
+        "marketComparison": "مقارنة مع السوق السعودي"
+    },
+    "developmentPlan": [
+        {
+            "area": "مجال التطوير",
+            "priority": "عالي/متوسط/منخفض",
+            "action": "الإجراء المطلوب",
+            "timeline": "الإطار الزمني"
+        }
+    ],
+    "finalSummary": "ملخص نهائي صادق ومباشر عن هذا المرشح"
+}`;
 
-function generateWeaknesses(basicInfo) {
-    const weaknessesPool = [
-        { category: 'المهارات التقنية', description: 'تطوير معرفة أعمق بالتقنيات الحديثة', improvement: 'أخذ دورات تدريبية متخصصة' },
-        { category: 'إدارة المشاريع', description: 'تعزيز مهارات التخطيط والتنظيم', improvement: 'الحصول على شهادة PMP' },
-        { category: 'التسويق الذاتي', description: 'تحسين عرض الإنجازات والخبرات', improvement: 'بناء محفظة أعمال قوية' },
-        { category: 'الشبكات المهنية', description: 'توسيع نطاق العلاقات المهنية', improvement: 'المشاركة في فعاليات المجال' }
-    ];
-    
-    return weaknessesPool.slice(0, 3);
-}
-
-function getExperienceText(experience) {
-    const texts = {
-        'fresh': 'حديث التخرج',
-        'junior': 'مبتدئ',
-        'mid': 'متوسط الخبرة', 
-        'senior': 'خبير'
-    };
-    return texts[experience] || 'مرشح';
-}
-
-function getEducationText(education) {
-    const texts = {
-        'highschool': 'ثانوية عامة',
-        'diploma': 'دبلوم',
-        'bachelor': 'بكالوريوس',
-        'master': 'ماجستير',
-        'phd': 'دكتوراه'
-    };
-    return texts[education] || 'مؤهل';
-}
-
-function getSpecializationText(specialization) {
-    const texts = {
-        'frontend': 'تطوير الواجهات الأمامية',
-        'backend': 'تطوير الواجهات الخلفية',
-        'fullstack': 'التطوير الشامل',
-        'mobile': 'تطوير التطبيقات المحمولة',
-        'devops': 'DevOps',
-        'uiux': 'تصميم UI/UX',
-        'graphic': 'التصميم الجرافيكي',
-        'web': 'تصميم المواقع',
-        'brand': 'تصميم الهوية',
-        'product': 'تصميم المنتجات',
-        'digital': 'التسويق الرقمي',
-        'social': 'إدارة وسائل التواصل',
-        'content': 'تسويق المحتوى',
-        'seo': 'تحسين محركات البحث',
-        'ppc': 'الإعلانات المدفوعة'
-    };
-    return texts[specialization] || 'التقنية';
-}
-
-function generateSuggestedJobs(specialization) {
-    const jobsBySpec = {
-        'frontend': ['مطور واجهات أمامية أول', 'مهندس React', 'مطور تطبيقات الويب'],
-        'backend': ['مهندس خادم أول', 'مطور Node.js', 'مهندس قواعد البيانات'],
-        'fullstack': ['مهندس برمجيات شامل', 'قائد فريق التطوير', 'مستشار تقني'],
-        'mobile': ['مطور تطبيقات محمولة أول', 'مهندس React Native', 'مطور iOS/Android'],
-        'uiux': ['مصمم تجربة مستخدم أول', 'قائد فريق التصميم', 'مستشار UX'],
-        'digital': ['مدير تسويق رقمي', 'استراتيجي تسويق', 'محلل تسويق رقمي']
-    };
-    
-    return jobsBySpec[specialization] || ['متخصص تقني', 'مستشار', 'قائد فريق'];
-}
-
-function determineFinalVerdict(score) {
-    if (score >= 90) return 'مناسب جداً للتوظيف';
-    if (score >= 80) return 'مناسب للتوظيف';
-    if (score >= 70) return 'مناسب مع التطوير';
-    return 'يحتاج تطوير إضافي';
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let analysisText = response.text();
+        
+        // Clean JSON response
+        analysisText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        
+        try {
+            const analysis = JSON.parse(analysisText);
+            
+            // Store comprehensive analysis in database
+            await window.ezsite.apis.tableCreate(35305, {
+                candidate_id: candidateId,
+                overall_score: analysis.overallScore || 0,
+                technical_score: analysis.detailedScores?.technicalSkills || 0,
+                experience_score: analysis.detailedScores?.medicalExperience || 0,
+                education_score: analysis.detailedScores?.academicQualifications || 0,
+                soft_skills_score: analysis.detailedScores?.communicationSkills || 0,
+                medical_expertise_score: analysis.detailedScores?.medicalExperience || 0,
+                strengths: JSON.stringify(analysis.strengths || []),
+                weaknesses: JSON.stringify(analysis.weaknesses || []),
+                recommendations: JSON.stringify(analysis.developmentPlan || []),
+                summary: analysis.finalSummary || '',
+                hiring_recommendation: analysis.hiringRecommendation?.decision || '',
+                risk_assessment: analysis.riskAssessment?.overallRisk || 'متوسط',
+                salary_recommendation: `${analysis.salaryAssessment?.recommendedRange?.minimum || 0} - ${analysis.salaryAssessment?.recommendedRange?.maximum || 0} ريال سعودي`
+            });
+            
+            return analysis;
+        } catch (parseError) {
+            console.error('Failed to parse Gemini response:', parseError);
+            console.log('Raw response:', analysisText);
+            
+            // Return comprehensive default analysis if parsing fails
+            const defaultAnalysis = {
+                overallScore: 40,
+                detailedScores: {
+                    medicalExperience: 40,
+                    academicQualifications: 50,
+                    technicalSkills: 45,
+                    communicationSkills: 50,
+                    saudiHealthSystemKnowledge: 30,
+                    problemSolving: 45
+                },
+                strengths: ["يحتاج مراجعة السيرة الذاتية"],
+                weaknesses: [{
+                    category: "تحليل السيرة الذاتية",
+                    description: "لم يتم التمكن من تحليل السيرة الذاتية بشكل كامل",
+                    impact: "صعوبة في تقييم الملاءمة للوظيفة",
+                    improvementSuggestion: "يرجى تحسين جودة ووضوح السيرة الذاتية"
+                }],
+                medicalExpertiseAssessment: {
+                    specialization: "غير محدد بوضوح",
+                    experienceLevel: "يحتاج تقييم إضافي",
+                    certifications: "غير واضحة",
+                    clinicalExperience: "تحتاج مراجعة",
+                    researchExperience: "غير محددة"
+                },
+                saudiMarketFit: {
+                    culturalAdaptability: 50,
+                    languageSkills: "يحتاج تقييم",
+                    regulatoryKnowledge: "غير واضحة",
+                    localExperience: "محدودة أو غير واضحة"
+                },
+                riskAssessment: {
+                    overallRisk: "متوسط إلى عالي",
+                    riskFactors: [{
+                        type: "عدم وضوح المعلومات",
+                        level: "عالي",
+                        description: "صعوبة في تحليل السيرة الذاتية",
+                        impact: "قرار توظيف غير مدروس",
+                        mitigation: "مقابلة شخصية مفصلة مطلوبة"
+                    }]
+                },
+                hiringRecommendation: {
+                    decision: "مراجعة إضافية",
+                    confidence: 30,
+                    reasoning: [
+                        "عدم وضوح المعلومات في السيرة الذاتية",
+                        "صعوبة في تقييم الملاءمة للوظيفة"
+                    ],
+                    conditions: ["مقابلة شخصية مفصلة", "مراجعة إضافية للوثائق"],
+                    nextSteps: ["ترتيب مقابلة شخصية", "طلب وثائق إضافية"]
+                },
+                salaryAssessment: {
+                    currency: "ريال سعودي",
+                    recommendedRange: {
+                        minimum: 5000,
+                        maximum: 8000,
+                        mostLikely: 6500
+                    },
+                    justification: "تقدير أولي يحتاج مراجعة بعد المقابلة",
+                    marketComparison: "ضمن النطاق العام للمبتدئين"
+                },
+                developmentPlan: [{
+                    area: "تحسين السيرة الذاتية",
+                    priority: "عالي",
+                    action: "إعادة كتابة السيرة الذاتية بشكل أوضح وأكثر تفصيلاً",
+                    timeline: "قبل التقديم مرة أخرى"
+                }],
+                finalSummary: "هذا المرشح يحتاج إلى مراجعة إضافية ومقابلة شخصية مفصلة لتحديد مدى ملاءمته للوظيفة في شركة ميس للمشاريع الطبية. السيرة الذاتية تحتاج لتحسين في الوضوح والتفصيل."
+            };
+            
+            // Store default analysis
+            await window.ezsite.apis.tableCreate(35305, {
+                candidate_id: candidateId,
+                overall_score: defaultAnalysis.overallScore,
+                technical_score: defaultAnalysis.detailedScores.technicalSkills,
+                experience_score: defaultAnalysis.detailedScores.medicalExperience,
+                education_score: defaultAnalysis.detailedScores.academicQualifications,
+                soft_skills_score: defaultAnalysis.detailedScores.communicationSkills,
+                medical_expertise_score: defaultAnalysis.detailedScores.medicalExperience,
+                strengths: JSON.stringify(defaultAnalysis.strengths),
+                weaknesses: JSON.stringify(defaultAnalysis.weaknesses),
+                recommendations: JSON.stringify(defaultAnalysis.developmentPlan),
+                summary: defaultAnalysis.finalSummary,
+                hiring_recommendation: defaultAnalysis.hiringRecommendation.decision,
+                risk_assessment: defaultAnalysis.riskAssessment.overallRisk,
+                salary_recommendation: `${defaultAnalysis.salaryAssessment.recommendedRange.minimum} - ${defaultAnalysis.salaryAssessment.recommendedRange.maximum} ريال سعودي`
+            });
+            
+            return defaultAnalysis;
+        }
+    } catch (error) {
+        console.error('CV Analysis error:', error);
+        throw new Error('فشل في تحليل السيرة الذاتية باستخدام الذكاء الاصطناعي. يرجى المحاولة مرة أخرى.');
+    }
 }

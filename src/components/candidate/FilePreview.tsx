@@ -31,7 +31,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
   const loadFilePreview = async () => {
     setIsLoading(true);
     setError('');
-    
+
     try {
       if (file.type.includes('pdf')) {
         // For PDF files, we'll show the text extract or a placeholder
@@ -67,15 +67,15 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
   };
 
   const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev + 0.25, 3));
+    setZoom((prev) => Math.min(prev + 0.25, 3));
   };
 
   const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev - 0.25, 0.5));
+    setZoom((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   const handleRotate = () => {
-    setRotation(prev => (prev + 90) % 360);
+    setRotation((prev) => (prev + 90) % 360);
   };
 
   const handleDownload = () => {
@@ -97,8 +97,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p>جارٍ تحميل المعاينة...</p>
           </div>
-        </div>
-      );
+        </div>);
+
     }
 
     if (error) {
@@ -108,8 +108,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
             <FileText className="w-16 h-16 mx-auto mb-4" />
             <p>{error}</p>
           </div>
-        </div>
-      );
+        </div>);
+
     }
 
     if (file.type.startsWith('image/')) {
@@ -125,29 +125,29 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
             }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: zoom }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
-      );
+            transition={{ duration: 0.3 }} />
+
+        </div>);
+
     }
 
     return (
-      <div 
+      <div
         className="h-full p-6 overflow-auto text-right"
         style={{
           transform: `scale(${zoom})`,
           transformOrigin: 'top right'
-        }}
-      >
+        }}>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="whitespace-pre-wrap font-mono text-sm leading-relaxed"
-        >
+          className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+
           {previewContent}
         </motion.div>
-      </div>
-    );
+      </div>);
+
   };
 
   const formatFileSize = (bytes: number) => {
@@ -165,15 +165,15 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
+        onClick={onClose}>
+
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col"
-          onClick={e => e.stopPropagation()}
-        >
+          onClick={(e) => e.stopPropagation()}>
+
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
@@ -191,8 +191,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
                 variant="outline"
                 size="sm"
                 onClick={handleZoomOut}
-                disabled={zoom <= 0.5}
-              >
+                disabled={zoom <= 0.5}>
+
                 <ZoomOut className="w-4 h-4" />
               </Button>
               
@@ -204,50 +204,50 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, textExtract, onClose, o
                 variant="outline"
                 size="sm"
                 onClick={handleZoomIn}
-                disabled={zoom >= 3}
-              >
+                disabled={zoom >= 3}>
+
                 <ZoomIn className="w-4 h-4" />
               </Button>
               
-              {file.type.startsWith('image/') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRotate}
-                >
+              {file.type.startsWith('image/') &&
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRotate}>
+
                   <RotateCw className="w-4 h-4" />
                 </Button>
-              )}
+              }
               
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleDownload}
-              >
+                onClick={handleDownload}>
+
                 <Download className="w-4 h-4" />
               </Button>
               
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onClose}
-              >
+                onClick={onClose}>
+
                 <X className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
           {/* Preview Content */}
-          <div 
+          <div
             ref={previewRef}
-            className="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900"
-          >
+            className="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900">
+
             {renderPreviewContent()}
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
-  );
+    </AnimatePresence>);
+
 };
 
 export default FilePreview;

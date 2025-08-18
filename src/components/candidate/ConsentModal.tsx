@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Shield, Check, X } from 'lucide-react';
+import { X, Shield, CheckCircle2, AlertTriangle, FileText } from 'lucide-react';
 
 interface ConsentModalProps {
   isOpen: boolean;
@@ -11,6 +10,29 @@ interface ConsentModalProps {
 }
 
 const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onClose, onAccept }) => {
+  const consentItems = [
+    {
+      icon: Shield,
+      title: "حماية البيانات الشخصية",
+      description: "نحن ملتزمون بحماية بياناتك الشخصية وفقاً لقوانين الخصوصية السعودية ومعايير شركة ميس للمشاريع الطبية"
+    },
+    {
+      icon: FileText,
+      title: "معالجة السيرة الذاتية",
+      description: "سيتم تحليل سيرتك الذاتية باستخدام تقنيات الذكاء الاصطناعي المتقدمة لتقييم ملاءمتك للوظائف الطبية"
+    },
+    {
+      icon: CheckCircle2,
+      title: "التقييم الطبي المتخصص",
+      description: "ستخضع لتقييم شامل يركز على المعايير الطبية والتقنية المطلوبة للعمل في المجال الطبي"
+    },
+    {
+      icon: AlertTriangle,
+      title: "السرية والموافقة",
+      description: "جميع المعلومات المقدمة ستبقى سرية وستُستخدم فقط لأغراض التوظيف في شركة ميس"
+    }
+  ];
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -18,97 +40,121 @@ const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onClose, onAccept }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-center mb-6">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="inline-block mb-4"
-              >
-                <Shield className="w-16 h-16 text-blue-500 mx-auto" />
-              </motion.div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                موافقة على معالجة البيانات الشخصية
-              </h2>
-              <p className="text-gray-600">
-                يرجى قراءة والموافقة على سياسة الخصوصية قبل المتابعة
-              </p>
+            <div className="p-8">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">م</span>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      شركة ميس للمشاريع الطبية
+                    </h2>
+                    <p className="text-gray-600">موافقة على معالجة البيانات</p>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-6 mb-8">
+                <div className="bg-blue-50 border-r-4 border-blue-400 p-4 rounded-lg">
+                  <h3 className="font-semibold text-blue-800 mb-2">مرحباً بك في عملية التقديم</h3>
+                  <p className="text-blue-700 text-sm leading-relaxed">
+                    شكراً لك على اهتمامك بالانضمام لفريق شركة ميس للمشاريع الطبية. قبل البدء في عملية التقديم، 
+                    يرجى الاطلاع على الشروط التالية والموافقة عليها.
+                  </p>
+                </div>
+
+                {/* Consent Items */}
+                <div className="space-y-4">
+                  {consentItems.map((item, index) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border"
+                      >
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <IconComponent className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-1">{item.title}</h4>
+                          <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Additional Information */}
+                <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
+                  <h4 className="font-semibold text-yellow-800 mb-2">معلومات مهمة:</h4>
+                  <ul className="text-yellow-700 text-sm space-y-1">
+                    <li>• ستستغرق عملية التقديم حوالي 30-45 دقيقة</li>
+                    <li>• يمكنك حفظ التقدم والعودة لاحقاً</li>
+                    <li>• ستحصل على تقييم مفصل لسيرتك الذاتية</li>
+                    <li>• المقابلة ستكون كتابية وتفاعلية</li>
+                    <li>• جميع البيانات محمية ومؤمنة</li>
+                  </ul>
+                </div>
+
+                {/* Medical Field Focus */}
+                <div className="bg-green-50 border-r-4 border-green-400 p-4 rounded-lg">
+                  <h4 className="font-semibold text-green-800 mb-2">التخصص الطبي:</h4>
+                  <p className="text-green-700 text-sm leading-relaxed">
+                    نحن متخصصون في المشاريع الطبية ونبحث عن مواهب في مختلف التخصصات الطبية والصحية. 
+                    سيتم تقييمك وفقاً لمعايير المجال الطبي ومتطلبات السوق السعودي.
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-end">
+                <Button
+                  onClick={onClose}
+                  variant="outline"
+                  className="sm:order-1"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={onAccept}
+                  className="bg-gradient-to-r from-green-500 to-blue-600 hover:opacity-90 text-white sm:order-2"
+                >
+                  أوافق وابدأ التقديم
+                </Button>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-xs text-gray-500 text-center">
+                  بالنقر على "أوافق وابدأ التقديم"، فإنك توافق على معالجة بياناتك الشخصية وفقاً لسياسة الخصوصية الخاصة بنا
+                </p>
+              </div>
             </div>
-
-            <div className="space-y-4 mb-8 text-right">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-blue-800 mb-2 flex items-center justify-end gap-2">
-                  <Check className="w-5 h-5" />
-                  جمع البيانات
-                </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">
-                  نقوم بجمع البيانات الأساسية والسيرة الذاتية فقط لأغراض التقييم والتوظيف.
-                  لن نشارك معلوماتك مع أطراف ثالثة دون موافقتك الصريحة.
-                </p>
-              </div>
-
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-green-800 mb-2 flex items-center justify-end gap-2">
-                  <Check className="w-5 h-5" />
-                  أمان البيانات
-                </h3>
-                <p className="text-green-700 text-sm leading-relaxed">
-                  تخزن جميع البيانات بشكل آمن ومشفر. نستخدم أحدث تقنيات الأمان لحماية معلوماتك الشخصية.
-                </p>
-              </div>
-
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-purple-800 mb-2 flex items-center justify-end gap-2">
-                  <Check className="w-5 h-5" />
-                  التحليل بالذكاء الاصطناعي
-                </h3>
-                <p className="text-purple-700 text-sm leading-relaxed">
-                  نستخدم الذكاء الاصطناعي لتحليل سيرتك الذاتية وتقديم اقتراحات لتحسينها.
-                  جميع التحليلات تتم بشكل آمن ومحمي.
-                </p>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2 flex items-center justify-end gap-2">
-                  <Check className="w-5 h-5" />
-                  حقوقك
-                </h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  يمكنك طلب حذف أو تعديل بياناتك في أي وقت. كما يمكنك سحب موافقتك والتوقف عن المشاركة.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <Button
-                onClick={onClose}
-                variant="outline"
-                className="flex-1 h-12"
-              >
-                <X className="w-4 h-4 ml-2" />
-                إلغاء
-              </Button>
-              <Button
-                onClick={onAccept}
-                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-              >
-                <Check className="w-4 h-4 ml-2" />
-                أوافق وأتابع
-              </Button>
-            </div>
-
-            <p className="text-xs text-gray-500 text-center mt-4">
-              بالموافقة، أنت تقر بأنك قرأت وفهمت سياسة الخصوصية وتوافق على معالجة بياناتك وفقاً لها
-            </p>
           </motion.div>
         </motion.div>
       )}

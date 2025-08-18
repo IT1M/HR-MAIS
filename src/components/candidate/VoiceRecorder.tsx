@@ -2,16 +2,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { 
-  Mic, 
-  MicOff, 
-  Square, 
-  Play, 
-  Pause, 
+import {
+  Mic,
+  MicOff,
+  Square,
+  Play,
+  Pause,
   Volume2,
   Clock,
-  AlertCircle 
-} from 'lucide-react';
+  AlertCircle } from
+'lucide-react';
 
 interface VoiceRecorderProps {
   onRecordingComplete?: (audioData: any) => void;
@@ -19,17 +19,17 @@ interface VoiceRecorderProps {
   className?: string;
 }
 
-const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ 
-  onRecordingComplete, 
+const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
+  onRecordingComplete,
   maxDuration = 120, // 2 minutes default
-  className = "" 
+  className = ""
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -39,7 +39,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     checkMicrophonePermission();
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
@@ -48,7 +48,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     let interval: NodeJS.Timeout;
     if (isRecording) {
       interval = setInterval(() => {
-        setDuration(prev => {
+        setDuration((prev) => {
           if (prev >= maxDuration) {
             handleStopRecording();
             return prev;
@@ -85,7 +85,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const handleStartRecording = async () => {
     try {
       let stream = streamRef.current;
-      
+
       if (!stream) {
         stream = await requestMicrophonePermission();
       }
@@ -93,7 +93,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       if (!stream) return;
 
       audioChunksRef.current = [];
-      
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
 
@@ -107,7 +107,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
-        
+
         if (onRecordingComplete) {
           onRecordingComplete({
             blob: audioBlob,
@@ -149,7 +149,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           setIsPlaying(false);
         });
       }
-      
+
       audioRef.current.play();
       setIsPlaying(true);
     }
@@ -180,14 +180,14 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             <Button
               onClick={requestMicrophonePermission}
               size="sm"
-              className="mt-2 bg-red-600 hover:bg-red-700"
-            >
+              className="mt-2 bg-red-600 hover:bg-red-700">
+
               طلب الإذن
             </Button>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -195,44 +195,44 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       {/* Recording Interface */}
       <div className="flex items-center justify-center gap-4">
         <AnimatePresence mode="wait">
-          {!isRecording ? (
-            <motion.div
-              key="start-button"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
+          {!isRecording ?
+          <motion.div
+            key="start-button"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}>
+
               <Button
-                onClick={handleStartRecording}
-                size="lg"
-                className="px-8 py-4 bg-red-500 hover:bg-red-600 text-white rounded-full"
-                disabled={hasPermission === null}
-              >
+              onClick={handleStartRecording}
+              size="lg"
+              className="px-8 py-4 bg-red-500 hover:bg-red-600 text-white rounded-full"
+              disabled={hasPermission === null}>
+
                 <Mic className="w-5 h-5 ml-2" />
                 بدء التسجيل
               </Button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="recording-controls"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-4"
-            >
+            </motion.div> :
+
+          <motion.div
+            key="recording-controls"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="flex items-center gap-4">
+
               {/* Recording Animation */}
               <motion.div
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  opacity: [1, 0.7, 1]
-                }}
-                transition={{ 
-                  duration: 1.5, 
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="w-4 h-4 bg-red-500 rounded-full"
-              />
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [1, 0.7, 1]
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-4 h-4 bg-red-500 rounded-full" />
+
               
               {/* Timer */}
               <div className={`font-mono text-lg font-semibold ${getTimeColor()}`}>
@@ -241,66 +241,66 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               
               {/* Stop Button */}
               <Button
-                onClick={handleStopRecording}
-                variant="destructive"
-                size="lg"
-                className="rounded-full"
-              >
+              onClick={handleStopRecording}
+              variant="destructive"
+              size="lg"
+              className="rounded-full">
+
                 <Square className="w-5 h-5 ml-2" />
                 إيقاف
               </Button>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </div>
 
       {/* Duration Indicator */}
-      {isRecording && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="bg-gray-50 p-3 rounded-lg"
-        >
+      {isRecording &&
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        className="bg-gray-50 p-3 rounded-lg">
+
           <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
             <span>مدة التسجيل</span>
             <span>{formatTime(maxDuration)} حد أقصى</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <motion.div
-              className={`h-2 rounded-full ${
-                duration >= maxDuration * 0.9 ? 'bg-red-500' :
-                duration >= maxDuration * 0.7 ? 'bg-yellow-500' :
-                'bg-blue-500'
-              }`}
-              animate={{ width: `${(duration / maxDuration) * 100}%` }}
-              transition={{ duration: 0.1 }}
-            />
+            className={`h-2 rounded-full ${
+            duration >= maxDuration * 0.9 ? 'bg-red-500' :
+            duration >= maxDuration * 0.7 ? 'bg-yellow-500' :
+            'bg-blue-500'}`
+            }
+            animate={{ width: `${duration / maxDuration * 100}%` }}
+            transition={{ duration: 0.1 }} />
+
           </div>
         </motion.div>
-      )}
+      }
 
       {/* Playback Controls */}
       <AnimatePresence>
-        {audioUrl && !isRecording && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="bg-green-50 border border-green-200 p-4 rounded-lg"
-          >
+        {audioUrl && !isRecording &&
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="bg-green-50 border border-green-200 p-4 rounded-lg">
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Button
-                  onClick={handlePlayback}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full border-green-300 hover:bg-green-100"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-4 h-4" />
-                  )}
+                onClick={handlePlayback}
+                variant="outline"
+                size="sm"
+                className="rounded-full border-green-300 hover:bg-green-100">
+
+                  {isPlaying ?
+                <Pause className="w-4 h-4" /> :
+
+                <Play className="w-4 h-4" />
+                }
                 </Button>
                 <div className="flex items-center gap-2 text-green-700">
                   <Volume2 className="w-4 h-4" />
@@ -311,30 +311,30 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               </div>
               
               <Button
-                onClick={handleStartRecording}
-                variant="outline"
-                size="sm"
-                className="border-green-300 text-green-700 hover:bg-green-100"
-              >
+              onClick={handleStartRecording}
+              variant="outline"
+              size="sm"
+              className="border-green-300 text-green-700 hover:bg-green-100">
+
                 تسجيل جديد
               </Button>
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
 
       {/* Instructions */}
-      {!isRecording && !audioUrl && (
-        <div className="text-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+      {!isRecording && !audioUrl &&
+      <div className="text-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
           <div className="flex items-center justify-center gap-2 mb-1">
             <Clock className="w-4 h-4" />
             <span>الحد الأقصى للتسجيل: {formatTime(maxDuration)}</span>
           </div>
           <p>اضغط على زر التسجيل وتحدث بوضوح</p>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default VoiceRecorder;

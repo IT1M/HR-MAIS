@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, Code, Palette, TrendingUp } from 'lucide-react';
+import { Sun, Moon, Contrast, Stethoscope, Palette, TrendingUp } from 'lucide-react';
 
 interface PersonaThemeToggleProps {
   persona: string;
@@ -18,49 +17,76 @@ const PersonaThemeToggle: React.FC<PersonaThemeToggleProps> = ({
   onThemeChange
 }) => {
   const personas = [
-    { id: 'developer', icon: Code, label: 'مطور', color: 'text-blue-500' },
-    { id: 'designer', icon: Palette, label: 'مصمم', color: 'text-purple-500' },
-    { id: 'marketer', icon: TrendingUp, label: 'مسوق', color: 'text-green-500' }
+    { id: 'medical', name: 'طبي', icon: Stethoscope, color: 'from-green-500 to-blue-600' },
+    { id: 'designer', name: 'مصمم', icon: Palette, color: 'from-pink-400 to-purple-600' },
+    { id: 'marketer', name: 'تسويق', icon: TrendingUp, color: 'from-green-400 to-blue-600' }
+  ];
+
+  const themes = [
+    { id: 'light', name: 'فاتح', icon: Sun },
+    { id: 'dark', name: 'داكن', icon: Moon },
+    { id: 'high-contrast', name: 'تباين عالي', icon: Contrast }
   ];
 
   return (
     <div className="flex items-center gap-4">
-      {/* Persona selector */}
-      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full p-1">
+      {/* Persona Toggle */}
+      <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl p-1">
         {personas.map((p) => {
-          const Icon = p.icon;
+          const IconComponent = p.icon;
           return (
             <motion.button
               key={p.id}
               onClick={() => onPersonaChange(p.id)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all ${
+              className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                 persona === p.id
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-800'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Icon className={`w-4 h-4 ${persona === p.id ? 'text-white' : p.color}`} />
-              <span className="text-sm font-medium">{p.label}</span>
+              {persona === p.id && (
+                <motion.div
+                  className={`absolute inset-0 bg-gradient-to-r ${p.color} rounded-lg`}
+                  layoutId="persona-bg"
+                  initial={false}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <div className="relative flex items-center gap-2">
+                <IconComponent className="w-4 h-4" />
+                <span className="hidden sm:inline">{p.name}</span>
+              </div>
             </motion.button>
           );
         })}
       </div>
 
-      {/* Theme toggle */}
-      <motion.button
-        onClick={() => onThemeChange(theme === 'light' ? 'dark' : 'light')}
-        className="p-3 bg-white/80 backdrop-blur-sm rounded-full text-gray-600 hover:bg-gray-100 transition-all"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        {theme === 'light' ? (
-          <Moon className="w-5 h-5" />
-        ) : (
-          <Sun className="w-5 h-5" />
-        )}
-      </motion.button>
+      {/* Theme Toggle */}
+      <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl p-1">
+        {themes.map((t) => {
+          const IconComponent = t.icon;
+          return (
+            <motion.button
+              key={t.id}
+              onClick={() => onThemeChange(t.id)}
+              className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                theme === t.id
+                  ? 'text-white bg-gray-800 shadow-md'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="flex items-center gap-2">
+                <IconComponent className="w-4 h-4" />
+                <span className="hidden md:inline">{t.name}</span>
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -23,7 +23,7 @@ const CandidatePortal: React.FC = () => {
   });
   const [showWizard, setShowWizard] = useState(false);
   const [showConsent, setShowConsent] = useState(false);
-  const [persona, setPersona] = useState('developer');
+  const [persona, setPersona] = useState('medical');
   const [theme, setTheme] = useState('light');
   const { toast } = useToast();
 
@@ -31,7 +31,7 @@ const CandidatePortal: React.FC = () => {
     // Set RTL direction
     document.documentElement.dir = 'rtl';
     document.documentElement.lang = 'ar';
-    
+
     // Apply data attributes for theming
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-persona', persona);
@@ -45,26 +45,27 @@ const CandidatePortal: React.FC = () => {
     setShowConsent(false);
     setShowWizard(true);
     toast({
-      title: "مرحباً بك",
-      description: "سنرشدك خلال عملية التقديم خطوة بخطوة",
+      title: "مرحباً بك في شركة ميس",
+      description: "سنرشدك خلال عملية التقديم للوظائف الطبية خطوة بخطوة",
       duration: 3000
     });
   };
 
   const handleStepComplete = async (stepData: any) => {
-    const updatedData = { ...candidateData, [getStepKey(currentStep)]: stepData };
+    const stepKey = getStepKey(currentStep);
+    const updatedData = { ...candidateData, [stepKey]: stepData };
     setCandidateData(updatedData);
-    
+
     // Save to backend
     try {
-      if (window.ezsite && window.ezsite.apis) {
+      if (window.ezsite?.apis) {
         const response = await window.ezsite.apis.run({
           path: "saveCandidateStep",
           param: [currentStep, stepData, candidateData.id]
         });
-        
-        if (response && response.candidateId) {
-          setCandidateData(prev => ({ ...prev, id: response.candidateId }));
+
+        if (response?.data?.candidateId) {
+          setCandidateData(prev => ({ ...prev, id: response.data.candidateId }));
         }
       }
     } catch (error) {
@@ -83,7 +84,7 @@ const CandidatePortal: React.FC = () => {
       // Complete application
       toast({
         title: "تم إكمال التقديم!",
-        description: "شكراً لك، سنتواصل معك قريباً",
+        description: "شكراً لك، سيتواصل معك فريق التوظيف في شركة ميس قريباً",
         duration: 5000
       });
     }
@@ -106,7 +107,7 @@ const CandidatePortal: React.FC = () => {
       evaluation: null
     });
     setShowWizard(false);
-    
+
     toast({
       title: "تم إعادة تعيين التطبيق",
       description: "يمكنك البدء من جديد",
@@ -115,14 +116,14 @@ const CandidatePortal: React.FC = () => {
   };
 
   return (
-    <div 
+    <div
       className={`min-h-screen transition-all duration-500 ${
-        theme === 'dark' 
-          ? 'bg-gray-900 text-white' 
-          : theme === 'high-contrast'
-          ? 'bg-black text-yellow-400'
-          : 'bg-gradient-to-br from-blue-50 to-purple-50 text-gray-900'
-      }`} 
+        theme === 'dark' ?
+        'bg-gray-900 text-white' :
+        theme === 'high-contrast' ?
+        'bg-black text-yellow-400' :
+        'bg-gradient-to-br from-blue-50 via-green-50 to-cyan-50 text-gray-900'
+      }`}
       dir="rtl"
       data-theme={theme}
       data-persona={persona}
@@ -132,16 +133,24 @@ const CandidatePortal: React.FC = () => {
       {/* Header */}
       <header className="relative z-10 p-6">
         <div className="container mx-auto flex justify-between items-center">
-          <motion.h1 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-2xl font-bold"
+            className="flex items-center gap-3"
           >
-            بوابة المرشحين
-          </motion.h1>
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">م</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-green-700">
+                شركة ميس للمشاريع الطبية
+              </h1>
+              <p className="text-sm text-gray-600">بوابة التقديم للوظائف الطبية</p>
+            </div>
+          </motion.div>
           <div className="flex items-center gap-4">
             <NotificationSystem />
-            <PersonaThemeToggle 
+            <PersonaThemeToggle
               persona={persona}
               theme={theme}
               onPersonaChange={setPersona}

@@ -44,7 +44,7 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       handleFile(files[0]);
@@ -84,7 +84,7 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
     try {
       // Simulate upload progress
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return prev;
@@ -96,10 +96,10 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
       // Parse file content
       const content = await parseFile(selectedFile);
       setPreviewContent(content);
-      
+
       clearInterval(progressInterval);
       setUploadProgress(100);
-      
+
       setTimeout(() => {
         setUploading(false);
         toast({
@@ -123,11 +123,11 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
   const parseFile = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = async (e) => {
         try {
           const result = e.target?.result;
-          
+
           if (file.type === 'text/plain') {
             resolve(result as string);
           } else if (file.type === 'application/pdf') {
@@ -180,7 +180,7 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
           reject(error);
         }
       };
-      
+
       reader.onerror = () => reject(new Error('خطأ في قراءة الملف'));
       reader.readAsText(file);
     });
@@ -218,14 +218,14 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
+
       <div className="text-center mb-8">
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="inline-block mb-4"
-        >
+          className="inline-block mb-4">
+
           <Upload className="w-16 h-16 text-blue-500" />
         </motion.div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -236,26 +236,26 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
         </p>
       </div>
 
-      {!file ? (
-        <motion.div
-          className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
-            dragActive 
-              ? 'border-blue-500 bg-blue-50' 
-              : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
-          }`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-          whileHover={{ scale: 1.02 }}
-        >
+      {!file ?
+      <motion.div
+        className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
+        dragActive ?
+        'border-blue-500 bg-blue-50' :
+        'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`
+        }
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        whileHover={{ scale: 1.02 }}>
+
           <input
-            type="file"
-            id="cv-upload"
-            className="hidden"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleFileInput}
-          />
+          type="file"
+          id="cv-upload"
+          className="hidden"
+          accept=".pdf,.doc,.docx,.txt"
+          onChange={handleFileInput} />
+
           
           <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h4 className="text-lg font-semibold text-gray-700 mb-2">
@@ -265,25 +265,25 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
             ادعم ملفات PDF، DOC، DOCX، TXT
           </p>
           
-          <Button 
-            size="lg"
-            onClick={() => document.getElementById('cv-upload')?.click()}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-          >
+          <Button
+          size="lg"
+          onClick={() => document.getElementById('cv-upload')?.click()}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+
             اختيار ملف السيرة الذاتية
           </Button>
-        </motion.div>
-      ) : (
-        <div className="space-y-6">
+        </motion.div> :
+
+      <div className="space-y-6">
           {/* Upload Progress */}
           <AnimatePresence>
-            {uploading && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-blue-50 p-4 rounded-lg"
-              >
+            {uploading &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-blue-50 p-4 rounded-lg">
+
                 <div className="flex items-center gap-3 mb-2">
                   <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full" />
                   <span className="font-medium">جاري رفع ومعالجة الملف...</span>
@@ -291,15 +291,15 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
                 <Progress value={uploadProgress} className="w-full" />
                 <p className="text-sm text-gray-600 mt-2">{uploadProgress}%</p>
               </motion.div>
-            )}
+          }
           </AnimatePresence>
 
           {/* File Info */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-green-50 border border-green-200 p-6 rounded-2xl"
-          >
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-green-50 border border-green-200 p-6 rounded-2xl">
+
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-8 h-8 text-green-500" />
@@ -313,10 +313,10 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
               
               <div className="flex items-center gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFile(null)}
-                >
+                variant="outline"
+                size="sm"
+                onClick={() => setFile(null)}>
+
                   تغيير الملف
                 </Button>
               </div>
@@ -324,12 +324,12 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
           </motion.div>
 
           {/* Preview */}
-          {previewContent && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="border rounded-2xl overflow-hidden"
-            >
+          {previewContent &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="border rounded-2xl overflow-hidden">
+
               <div className="bg-gray-50 p-4 border-b flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="w-5 h-5 text-gray-600" />
@@ -338,60 +338,60 @@ const CVUploadStep: React.FC<CVUploadStepProps> = ({ data, onComplete, persona }
                 
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
-                  >
+                variant="outline"
+                size="sm"
+                onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}>
+
                     <ZoomOut className="w-4 h-4" />
                   </Button>
                   <span className="text-sm font-medium">{zoomLevel}%</span>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setZoomLevel(Math.min(200, zoomLevel + 10))}
-                  >
+                variant="outline"
+                size="sm"
+                onClick={() => setZoomLevel(Math.min(200, zoomLevel + 10))}>
+
                     <ZoomIn className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
               
-              <div 
-                className="p-6 max-h-96 overflow-y-auto bg-white text-right"
-                style={{ fontSize: `${zoomLevel}%` }}
-              >
+              <div
+            className="p-6 max-h-96 overflow-y-auto bg-white text-right"
+            style={{ fontSize: `${zoomLevel}%` }}>
+
                 <pre className="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed">
                   {previewContent}
                 </pre>
               </div>
             </motion.div>
-          )}
+        }
 
           {/* Continue Button */}
-          <motion.div 
-            className="flex justify-center pt-6"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.div
+          className="flex justify-center pt-6"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}>
+
             <Button
-              onClick={handleContinue}
-              size="lg"
-              className="px-12 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-lg font-semibold"
-              disabled={uploading}
-            >
-              {uploading ? (
-                <>
+            onClick={handleContinue}
+            size="lg"
+            className="px-12 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-lg font-semibold"
+            disabled={uploading}>
+
+              {uploading ?
+            <>
                   <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full ml-2" />
                   جاري المعالجة...
-                </>
-              ) : (
-                'متابعة للتحليل ←'
-              )}
+                </> :
+
+            'متابعة للتحليل ←'
+            }
             </Button>
           </motion.div>
         </div>
-      )}
-    </motion.div>
-  );
+      }
+    </motion.div>);
+
 };
 
 export default CVUploadStep;
