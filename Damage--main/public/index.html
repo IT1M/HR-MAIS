@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation & Dashboard Builder</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="description" content="Bilingual AI-powered presentation and dashboard builder">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/styles.css">
+    
+    <!-- Prism.js for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="app-title">
+                    <span class="icon">🤖</span>
+                    <span data-i18n="app.title">AI Builder</span>
+                </h1>
+            </div>
+            
+            <div class="header-controls">
+                <!-- Language Selector -->
+                <select id="languageSelect" class="control-select">
+                    <option value="auto" data-i18n="language.auto">Auto</option>
+                    <option value="en" data-i18n="language.english">English</option>
+                    <option value="ar" data-i18n="language.arabic">العربية</option>
+                </select>
+                
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="control-btn" title="Toggle theme">
+                    <span class="icon">🌙</span>
+                </button>
+                
+                <!-- Provider Selector -->
+                <select id="providerSelect" class="control-select">
+                    <option value="auto">Auto</option>
+                    <option value="gemini">Gemini</option>
+                    <option value="groq">Groq</option>
+                </select>
+                
+                <!-- Settings Button -->
+                <button id="settingsBtn" class="control-btn" title="Settings">
+                    <span class="icon">⚙️</span>
+                </button>
+                
+                <!-- Command Palette Trigger -->
+                <button id="commandPaletteBtn" class="control-btn" title="Command Palette (⌘K)">
+                    <span class="icon">⌘</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Agent A: Presentations (Top Section) -->
+        <section id="agentA" class="agent-section agent-presentations">
+            <div class="agent-header">
+                <h2 data-i18n="agent.presentations.title">Presentation Builder</h2>
+                <div class="agent-controls">
+                    <button id="newPresentationBtn" class="btn btn-primary">
+                        <span class="icon">📊</span>
+                        <span data-i18n="agent.presentations.new">New Presentation</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="agent-content">
+                <!-- Chat Interface -->
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <textarea id="chatInput" 
+                                placeholder="Describe your presentation..." 
+                                data-i18n-placeholder="chat.placeholder"
+                                rows="2"></textarea>
+                        <button id="sendChatBtn" class="btn btn-primary">
+                            <span class="icon">📤</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Slides Panel -->
+                <div id="slidesPanel" class="slides-panel hidden">
+                    <div class="slides-header">
+                        <h3 data-i18n="slides.title">Slides</h3>
+                        <div class="slides-controls">
+                            <select id="slideTheme" class="control-select">
+                                <option value="modern">Modern</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="corporate">Corporate</option>
+                                <option value="playful">Playful</option>
+                            </select>
+                            <button id="brandKitBtn" class="btn btn-secondary">
+                                <span class="icon">🎨</span>
+                                <span data-i18n="slides.brandKit">Brand Kit</span>
+                            </button>
+                            <button id="exportSlidesBtn" class="btn btn-primary">
+                                <span class="icon">📥</span>
+                                <span data-i18n="slides.export">Export</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="slidesContainer" class="slides-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent B: Dashboard (Bottom Docked Panel) -->
+        <section id="agentB" class="agent-section agent-dashboard docked-panel">
+            <div class="panel-handle" id="dashboardHandle">
+                <div class="handle-bar"></div>
+                <span class="panel-title" data-i18n="agent.dashboard.title">Data Dashboard</span>
+                <button id="toggleDashboardBtn" class="panel-toggle">
+                    <span class="icon">📈</span>
+                </button>
+            </div>
+            
+            <div class="panel-content" id="dashboardContent">
+                <div class="dashboard-tabs">
+                    <button class="tab-btn active" data-tab="upload" data-i18n="dashboard.tabs.upload">Upload</button>
+                    <button class="tab-btn" data-tab="analyze" data-i18n="dashboard.tabs.analyze">Analyze</button>
+                    <button class="tab-btn" data-tab="visualize" data-i18n="dashboard.tabs.visualize">Visualize</button>
+                    <button class="tab-btn" data-tab="insights" data-i18n="dashboard.tabs.insights">Insights</button>
+                </div>
+                
+                <!-- Upload Tab -->
+                <div id="uploadTab" class="tab-content active">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p data-i18n="upload.dragDrop">Drag & drop files here or click to browse</p>
+                        <p class="upload-formats" data-i18n="upload.formats">Supports: Excel, CSV, PDF, DOCX</p>
+                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.pdf,.docx" multiple hidden>
+                    </div>
+                    <div id="filesList" class="files-list"></div>
+                </div>
+                
+                <!-- Analyze Tab -->
+                <div id="analyzeTab" class="tab-content">
+                    <div class="analyze-controls">
+                        <button id="analyzeDataBtn" class="btn btn-primary" disabled>
+                            <span class="icon">🔍</span>
+                            <span data-i18n="analyze.button">Analyze Data</span>
+                        </button>
+                    </div>
+                    <div id="dataProfile" class="data-profile"></div>
+                </div>
+                
+                <!-- Visualize Tab -->
+                <div id="visualizeTab" class="tab-content">
+                    <div class="visualize-controls">
+                        <textarea id="chartQuestion" 
+                                placeholder="What would you like to visualize?"
+                                data-i18n-placeholder="visualize.question"
+                                rows="2"></textarea>
+                        <button id="suggestChartsBtn" class="btn btn-primary" disabled>
+                            <span class="icon">💡</span>
+                            <span data-i18n="visualize.suggest">Suggest Charts</span>
+                        </button>
+                    </div>
+                    <div id="chartSuggestions" class="chart-suggestions"></div>
+                    <div id="chartsGrid" class="charts-grid"></div>
+                </div>
+                
+                <!-- Insights Tab -->
+                <div id="insightsTab" class="tab-content">
+                    <div class="insights-controls">
+                        <button id="generateInsightsBtn" class="btn btn-primary" disabled>
+                            <span class="icon">🧠</span>
+                            <span data-i18n="insights.generate">Generate Insights</span>
+                        </button>
+                    </div>
+                    <div id="insightsContent" class="insights-content"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Command Palette Modal -->
+    <div id="commandPalette" class="modal hidden">
+        <div class="modal-content command-palette-content">
+            <input type="text" id="commandInput" placeholder="Type a command..." data-i18n-placeholder="command.placeholder">
+            <div id="commandResults" class="command-results"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="settings.title">Settings</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label data-i18n="settings.temperature">Temperature</label>
+                    <input type="range" id="temperatureSlider" min="0" max="1" step="0.1" value="0.7">
+                    <span id="temperatureValue">0.7</span>
+                </div>
+                <div class="setting-group">
+                    <label data-i18n="settings.maxTokens">Max Tokens</label>
+                    <input type="number" id="maxTokensInput" value="2000" min="100" max="4000">
+                </div>
+                <div class="setting-group">
+                    <label data-i18n="settings.model">Model</label>
+                    <input type="text" id="modelInput" placeholder="Default model">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand Kit Modal -->
+    <div id="brandKitModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="brandKit.title">Brand Kit</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="brand-upload">
+                    <label data-i18n="brandKit.logo">Upload Logo</label>
+                    <input type="file" id="logoInput" accept="image/*">
+                    <div id="logoPreview" class="logo-preview"></div>
+                </div>
+                <div class="brand-colors">
+                    <h4 data-i18n="brandKit.colors">Brand Colors</h4>
+                    <div class="color-inputs">
+                        <div class="color-input">
+                            <label data-i18n="brandKit.primary">Primary</label>
+                            <input type="color" id="primaryColor" value="#0ea5e9">
+                        </div>
+                        <div class="color-input">
+                            <label data-i18n="brandKit.accent">Accent</label>
+                            <input type="color" id="accentColor" value="#f59e0b">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p id="loadingText" data-i18n="loading.default">Processing...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="/app.js"></script>
+</body>
+</html>
