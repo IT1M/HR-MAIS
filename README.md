@@ -5,7 +5,7 @@
 
 ---
 
-## ✨ المزايا التقنية (Tech Stack)
+## ✨ المزايا التقنية (Tech Stack) 
 
 •⁠  ⁠⚡ *Vite* — بناء وتشغيل سريع للمشروع.
 •⁠  ⁠⚛️ *React 18* — أحدث مزايا React.
@@ -48,4 +48,4 @@
 1) *نسخ المستودع*
 ```bash
 git clone https://github.com/IT1M/HR-MAIS.git
-cd HR-MAIS
+cd HR-MAIS# j
