@@ -10,6 +10,17 @@ import VacancySearch from '@/components/candidate/VacancySearch';
 import AnimatedBackground from '@/components/candidate/AnimatedBackground';
 import NotificationSystem from '@/components/candidate/NotificationSystem';
 
+// Extend Window interface to include ezsite
+declare global {
+  interface Window {
+    ezsite?: {
+      apis?: {
+        run: (args: { path: string; param: any[] }) => Promise<any>;
+      };
+    };
+  }
+}
+
 const CandidatePortal: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [candidateData, setCandidateData] = useState({
